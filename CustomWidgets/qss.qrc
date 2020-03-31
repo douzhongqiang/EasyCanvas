@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qss/light.css</file>
+        <file>qss/images/add_bottom.png</file>
+        <file>qss/images/add_left.png</file>
+        <file>qss/images/add_right.png</file>
+        <file>qss/images/add_top.png</file>
+        <file>qss/images/branch_open.png</file>
+        <file>qss/images/calendar_nextmonth.png</file>
+        <file>qss/images/calendar_prevmonth.png</file>
+        <file>qss/images/checkbox_checked.png</file>
+        <file>qss/images/checkbox_checked_disable.png</file>
+        <file>qss/images/checkbox_parcial.png</file>
+        <file>qss/images/checkbox_parcial_disable.png</file>
+        <file>qss/images/checkbox_unchecked.png</file>
+        <file>qss/images/checkbox_unchecked_disable.png</file>
+        <file>qss/images/close_hover.svg</file>
+        <file>qss/images/close_normal.svg</file>
+        <file>qss/images/close_pressed.svg</file>
+        <file>qss/images/comboBox_bottom.png</file>
+        <file>qss/images/maximize_hover.svg</file>
+        <file>qss/images/maximize_normal.svg</file>
+        <file>qss/images/maximize_pressed.svg</file>
+        <file>qss/images/maximized_hover.svg</file>
+        <file>qss/images/maximized_normal.svg</file>
+        <file>qss/images/maximized_pressed.svg</file>
+        <file>qss/images/minimize_hover.svg</file>
+        <file>qss/images/minimize_normal.svg</file>
+        <file>qss/images/minimize_pressed.svg</file>
+        <file>qss/images/radiobutton_checked.png</file>
+        <file>qss/images/radiobutton_checked_disable.png</file>
+        <file>qss/images/radiobutton_unchecked.png</file>
+        <file>qss/images/radiobutton_unchecked_disable.png</file>
+        <file>qss/images/branch_end.png</file>
+        <file>qss/images/branch_more.png</file>
+        <file>qss/images/stylesheet-branch-open.png</file>
+        <file>qss/images/vline.png</file>
+        <file>qss/images/branch_closed.png</file>
+        <file>qss/images/branch_closed2.png</file>
+    </qresource>
+</RCC>
