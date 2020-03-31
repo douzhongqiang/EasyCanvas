@@ -2,8 +2,7 @@
 
 软件绿色版下载地址：
 
-链接：https://pan.baidu.com/s/1lGDq4avFVo_2K_XMQz_Clg 
-提取码：ve3i
+链接：https://pan.baidu.com/s/1r2zKmt4ID_7p0V8Fm7e7cQ 提取码：m6n1
 
 
 
