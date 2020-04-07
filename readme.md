@@ -5,6 +5,8 @@
 链接：https://pan.baidu.com/s/1r2zKmt4ID_7p0V8Fm7e7cQ 提取码：m6n1
 视频演示地址：https://www.bilibili.com/video/BV18K411L7Ca/
 
+**注意：** 这里使用的是64位的FFmpeg库，如果编译的时候报错，请编译成64位的版本或者自行替换成32位的FFMpeg库。
+
 # 1. 基本功能
 
 1. 画布设置，可以修改画布的尺寸、颜色信息
