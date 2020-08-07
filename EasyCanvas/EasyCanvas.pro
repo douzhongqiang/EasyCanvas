@@ -27,14 +27,16 @@ RC_ICONS = EasyCanvas.ico
 
 MOC_DIR += $$PWD/../temp/EasyCanvas
 OBJECTS_DIR += $$PWD/../temp/EasyCanvas
-DESTDIR += $$PWD/bin
+DESTDIR += $$PWD/../bin
 
-LIBS += -L$$PWD/../lib/CustomWidgets -lCustomWidgets
-LIBS += -L$$PWD/../lib/CustomControls -lCustomControls
-LIBS += -L$$PWD/../lib/Utils -lUtils
-LIBS += -L$$PWD/../lib/NDNodeAttribute -lNDNodeAttribute
-LIBS += -L$$PWD/../lib/NodeAttributeControl -lNodeAttributeControl
-LIBS += -L$$PWD/../lib/AudioVideoCore -lAudioVideoCore
+LIBS += -L$$PWD/../bin -lCustomWidgets
+LIBS += -L$$PWD/../bin -lCustomControls
+LIBS += -L$$PWD/../bin -lUtils
+LIBS += -L$$PWD/../bin -lNDNodeAttribute
+LIBS += -L$$PWD/../bin -lNodeAttributeControl
+LIBS += -L$$PWD/../bin -lAudioVideoCore
+LIBS += -L$$PWD/../bin -lPythonWrap
+LIBS += -L$$PWD/../bin -lEasyCanvasCore
 
 INCLUDEPATH += $$PWD/../CustomWidgets
 INCLUDEPATH += $$PWD/../CustomControls
@@ -42,39 +44,29 @@ INCLUDEPATH += $$PWD/../NDNodeAttribute
 INCLUDEPATH += $$PWD/../NodeAttributeControl
 INCLUDEPATH += $$PWD/../Utils
 INCLUDEPATH += $$PWD/../AudioVideoCore
+INCLUDEPATH += $$PWD/../PythonWrap
+INCLUDEPATH += $$PWD/../EasyCanvasCore
 INCLUDEPATH += $$PWD/UICanvas
 INCLUDEPATH += $$PWD/UICore
 INCLUDEPATH += $$PWD/../thirdLibs/ffmpeg/include
 
+INCLUDEPATH += $$PWD/../thirdLibs/PythonQt/include
+INCLUDEPATH += $$PWD/../thirdLibs/python3_8/include
+CONFIG(debug, debug|release) {
+    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/debug -lPythonQt_QtAll-Qt5-Python38_d -lPythonQt-Qt5-Python38_d
+    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3_d -lpython38_d
+} else {
+    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
+    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
+}
+
 SOURCES += \
-        UICanvas/UICanvasArrows.cpp \
-    UICanvas/UICanvasAudioItem.cpp \
-        UICanvas/UICanvasEllipseItem.cpp \
-        UICanvas/UICanvasImageItem.cpp \
-        UICanvas/UICanvasItemBase.cpp \
-        UICanvas/UICanvasOperators.cpp \
-        UICanvas/UICanvasPathItem.cpp \
-        UICanvas/UICanvasRectItem.cpp \
-    UICanvas/UICanvasScene.cpp \
-        UICanvas/UICanvasTextItem.cpp \
-        UICanvas/UICanvasView.cpp \
         UICore/MainWindow.cpp \
     UICore/UIAboutMeDialog.cpp \
         UICore/UIAttributWidget.cpp \
 		main.cpp
 
 HEADERS += \
-        UICanvas/UICanvasArrows.h \
-        UICanvas/UICanvasAudioItem.h \
-        UICanvas/UICanvasEllipseItem.h \
-        UICanvas/UICanvasImageItem.h \
-        UICanvas/UICanvasItemBase.h \
-        UICanvas/UICanvasOperators.h \
-        UICanvas/UICanvasPathItem.h \
-        UICanvas/UICanvasRectItem.h \
-        UICanvas/UICanvasScene.h \
-        UICanvas/UICanvasTextItem.h \
-        UICanvas/UICanvasView.h \
         UICore/MainWindow.h \
         UICore/UIAboutMeDialog.h \
         UICore/UIAttributWidget.h

@@ -11,7 +11,7 @@ TEMPLATE = lib
 
 DEFINES += UTILS_LIBRARY
 
-DESTDIR += $$PWD/../lib/Utils
+DESTDIR += $$PWD/../bin
 MOC_DIR += $$PWD/../Utils/temp
 OBJECTS_DIR += $$PWD/../Utils/temp
 CONFIG += c++11

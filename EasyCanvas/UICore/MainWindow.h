@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include <QMainWindow>
-#include "UICanvasView.h"
+#include "UICanvas/UICanvasView.h"
 #include "UIAttributWidget.h"
+#include "UINodeTree/UINodeTreeView.h"
 
 class QToolBar;
 class MainWindow : public QMainWindow
@@ -17,7 +18,11 @@ public:
 
 private:
     UICanvasView* m_pCanvasView = nullptr;
+    // 属性界面
     UIAttributeWidget* m_pAttributeWidget = nullptr;
+    // 节点树
+    UINodeTreeView* m_pNodeTreeWidget = nullptr;
+
     QToolBar* m_pToolBar = nullptr;
 
     void initToolBar(void);
@@ -39,6 +44,10 @@ private slots:
     void onClickedSaveAs(void);
     // 关于我
     void onClickedAboutMe(void);
+
+    // 编辑菜单
+    // 脚本编辑器
+    void onClickedScriptEdit(void);
 };
 
 #endif // WIDGET_H

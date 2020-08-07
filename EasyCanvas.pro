@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    EasyCanvasCore \
+    PythonWrap \
 	Utils \
     AudioVideoCore \
     CustomControls \

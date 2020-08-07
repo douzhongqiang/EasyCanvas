@@ -12,18 +12,28 @@
 #include <QMessageBox>
 #include "NDNodeBase.h"
 #include "UIAboutMeDialog.h"
+#include "PythonWrapCore.h"
+#include "UICanvas/UICanvasItemManager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // 创建画布
     m_pCanvasView = new UICanvasView;
     this->setCentralWidget(m_pCanvasView);
+    g_PythonWrapCode->setSceneNode(m_pCanvasView->getCurrentSceneNode());
 
     // 添加属性界面
     m_pAttributeWidget = new UIAttributeWidget;
     QDockWidget* attrDockWidget = new QDockWidget(tr("Attribute"));
     attrDockWidget->setWidget(m_pAttributeWidget);
     this->addDockWidget(Qt::RightDockWidgetArea, attrDockWidget);
+
+    // 添加节点树
+    m_pNodeTreeWidget = new UINodeTreeView;
+    QDockWidget* pNodeTreeDockWidget = new QDockWidget(tr("NodeTree"));
+    pNodeTreeDockWidget->setWidget(m_pNodeTreeWidget);
+    this->addDockWidget(Qt::LeftDockWidgetArea, pNodeTreeDockWidget);
 
     QObject::connect(m_pCanvasView, &UICanvasView::itemSelectedChanged, \
                      this, &MainWindow::onSelectedItemChanged);
@@ -95,6 +105,13 @@ void MainWindow::initMenuBar(void)
     QAction* saveAction = new QAction(tr("Save As"));
     fileMenu->addAction(saveAction);
     QObject::connect(saveAction, &QAction::triggered, this, &MainWindow::onClickedSaveAs);
+
+    // 添加编辑菜单
+    QMenu* editMenu = new QMenu(tr("Edit"));
+    menuBar->addMenu(editMenu);
+    QAction* pythonScriptAction = new QAction(tr("Script Editor"));
+    editMenu->addAction(pythonScriptAction);
+    QObject::connect(pythonScriptAction, &QAction::triggered, this, &MainWindow::onClickedScriptEdit);
 
     // 添加Item
     QMenu* canvasItem = new QMenu(tr("CanvasItem"));
@@ -189,4 +206,9 @@ void MainWindow::onClickedAboutMe(void)
     UIAboutMeDialog aboutMeDialog;
     aboutMeDialog.resize(900, 600);
     aboutMeDialog.exec();
+}
+
+void MainWindow::onClickedScriptEdit(void)
+{
+    g_PythonWrapCode->showScriptingConsole();
 }

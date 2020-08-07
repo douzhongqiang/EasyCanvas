@@ -17,14 +17,14 @@ DEFINES += NODEATTRIBUTECONTROL_LIBRARY
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-DESTDIR += $$PWD/../lib/NodeAttributeControl
+DESTDIR += $$PWD/../bin
 MOC_DIR += $$PWD/../NodeAttributeControl/temp
 OBJECTS_DIR += $$PWD/../NodeAttributeControl/temp
 CONFIG += c++11
 
-LIBS += -L$$PWD/../lib/CustomWidgets -lCustomWidgets
-LIBS += -L$$PWD/../lib/CustomControls -lCustomControls
-LIBS += -L$$PWD/../lib/NDNodeAttribute -lNDNodeAttribute
+LIBS += -L$$PWD/../bin -lCustomWidgets
+LIBS += -L$$PWD/../bin -lCustomControls
+LIBS += -L$$PWD/../bin -lNDNodeAttribute
 
 INCLUDEPATH += $$PWD/../CustomWidgets
 INCLUDEPATH += $$PWD/../CustomControls

@@ -11,12 +11,12 @@ TEMPLATE = lib
 
 DEFINES += NDNODEATTRIBUTE_LIBRARY
 
-DESTDIR += $$PWD/../lib/NDNodeAttribute
+DESTDIR += $$PWD/../bin
 MOC_DIR += $$PWD/../NDNodeAttribute/temp
 OBJECTS_DIR += $$PWD/../NDNodeAttribute/temp
 CONFIG += c++11
 
-LIBS += -L$$PWD/../lib/Utils -lUtils
+LIBS += -L$$PWD/../bin -lUtils
 INCLUDEPATH += $$PWD/../Utils
 
 # The following define makes your compiler emit warnings if you use

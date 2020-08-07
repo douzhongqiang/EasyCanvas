@@ -11,7 +11,7 @@ TEMPLATE = lib
 
 DEFINES += CUSTOMWIDGETS_LIBRARY
 
-DESTDIR += $$PWD/../lib/CustomWidgets
+DESTDIR += $$PWD/../bin
 MOC_DIR += $$PWD/../CustomWidgets/temp
 OBJECTS_DIR += $$PWD/../CustomWidgets/temp
 CONFIG += c++11

@@ -561,7 +561,7 @@ QTableView
 QTreeView, QListView, QListWidget
 {
     show-decoration-selected: 1;
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(80, 80, 80);
     color: rgb(255, 255, 255);
     outline: none;
     border-radius: 4px;
@@ -569,19 +569,19 @@ QTreeView, QListView, QListWidget
 
 QTreeView::item, QListView::item, QListWidget::item, QTableView::item
 {
-    background: rgb(40, 40, 40);
+    background: rgb(80, 80, 80);
     color: rgb(255, 255, 255);
     outline: none;
 }
 
 QTreeView::item:hover, QListView::item:hover, QListWidget::item:hover, QTableView::item:hover
 {
-    background: rgb(253, 135, 50);
+    background: rgba(253, 135, 50, 100);
 }
 
 QTreeView::item:selected, QListView::item:selected, QListWidget::item:selected, QTableView::item:selected
 {
-    background: rgb(40, 40, 40);
+    background: rgb(253, 135, 50);
     outline: none;
 }
 
@@ -702,6 +702,21 @@ QDoubleSpinBox::down-button,QSpinBox::down-button
 }
 
 /*---------------------------------Tree Branch Abourt---------------------------------*/
+QTreeView::branch
+{
+    background: rgb(80, 80, 80);
+}
+
+QTreeView::branch:hover
+{
+    background: rgba(235, 135, 50, 100);
+}
+
+QTreeView::branch:selected
+{
+    background: rgb(235, 135, 50);
+}
+
 QTreeView::branch:has-siblings:!adjoins-item {
       border-image: url(:/qss/images/vline.png) 0;
 }

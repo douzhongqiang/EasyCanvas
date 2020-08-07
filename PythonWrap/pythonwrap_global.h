@@ -1,0 +1,12 @@
+#ifndef PYTHONWRAP_GLOBAL_H
+#define PYTHONWRAP_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(PYTHONWRAP_LIBRARY)
+#  define PYTHONWRAPSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define PYTHONWRAPSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // PYTHONWRAP_GLOBAL_H
