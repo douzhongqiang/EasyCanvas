@@ -29,6 +29,9 @@ public:
     // 设置当前的TreeView
     void setCurrentTreeView(QTreeView* pTreeView);
 
+    // 获取一个索引
+    QModelIndex getIndexByName(const QString nodeName);
+
 private:
     UICanvasItemManager* m_pCanvasItemData = nullptr;
     UINodeItem* m_pRootNodeItem = nullptr;

@@ -5,14 +5,18 @@
 #include <QString>
 #include <QVector>
 
-class UINodeItem
+class UINodeItem : public QObject
 {
+    Q_OBJECT
+
 public:
     explicit UINodeItem(UINodeItem* parentItem = nullptr);
     ~UINodeItem();
 
     // 添加子节点
     void appendChildNode(UINodeItem* nodeItem);
+    // 刪除子节点
+    void removeChildNode(const QString& nodeName);
     // 获取子节点
     UINodeItem* getChildNode(int index);
 

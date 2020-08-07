@@ -9,6 +9,7 @@ UINodeTreeViewModel::UINodeTreeViewModel(QObject* parent)
     updateAllNodes();
 
     QObject::connect(m_pCanvasItemData, &UICanvasItemManager::addedNode, this, &UINodeTreeViewModel::onAddedNodeItem);
+    QObject::connect(m_pCanvasItemData, &UICanvasItemManager::deletedNode, this, &UINodeTreeViewModel::onDeleteNodeItem);
 }
 
 UINodeTreeViewModel::~UINodeTreeViewModel()
@@ -99,7 +100,7 @@ Qt::ItemFlags UINodeTreeViewModel::flags(const QModelIndex &index) const
 {
     UINodeItem* pNode = static_cast<UINodeItem*>(index.internalPointer());
     if (!pNode->isCanvasNode())
-        return QAbstractItemModel::flags(index);
+        return QAbstractItemModel::flags(index) & ~Qt::ItemIsSelectable;
 
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
@@ -108,6 +109,7 @@ void UINodeTreeViewModel::updateAllNodes(void)
 {
     // 创建根节点
     m_pRootNodeItem = new UINodeItem;
+    m_pRootNodeItem->setParent(this);
     m_pRootNodeItem->setName(tr("CanvasNode"));
 
     int nodeTypeCount = m_pCanvasItemData->getNodeCounts();
@@ -130,15 +132,51 @@ void UINodeTreeViewModel::setCurrentTreeView(QTreeView* pTreeView)
     m_pTreeView = pTreeView;
 }
 
+QModelIndex UINodeTreeViewModel::getIndexByName(const QString nodeName)
+{
+    if (m_pRootNodeItem == nullptr)
+        return QModelIndex();
+
+    int count = m_pRootNodeItem->getSubNodeCount();
+    QModelIndex rootIndex = index(0, 0);
+
+    for (int i=0; i<count; ++i)
+    {
+        // 获取类别节点
+        UINodeItem* typeNodes = m_pRootNodeItem->getChildNode(i);
+        QModelIndex typeIndex = index(i, 0, rootIndex);
+
+        int subCount = typeNodes->getSubNodeCount();
+        // 查找目标节点
+        for (int j = 0; j < subCount; ++j)
+        {
+            UINodeItem* node = typeNodes->getChildNode(j);
+            if (node && node->getName() == nodeName)
+            {
+                // 找到了
+                QModelIndex destIndex = index(j, 0, typeIndex);
+                return destIndex;
+            }
+        }
+    }
+
+    return QModelIndex();
+}
+
 bool UINodeTreeViewModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || role != Qt::EditRole)
         return false;
 
     UINodeItem* pNode = static_cast<UINodeItem*>(index.internalPointer());
-    pNode->setName(value.toString());
+    QString nodeName = pNode->getName();
+    if (m_pCanvasItemData->changedNodeName(nodeName, value.toString()))
+    {
+        pNode->setName(value.toString());
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 void UINodeTreeViewModel::onAddedNodeItem(int nodeType, const QString& name)
@@ -160,5 +198,14 @@ void UINodeTreeViewModel::onAddedNodeItem(int nodeType, const QString& name)
 
 void UINodeTreeViewModel::onDeleteNodeItem(int nodeType, const QString& name)
 {
+    UINodeItem* node = m_pRootNodeItem->getChildNode(nodeType - 2);
+    if (node == nullptr)
+        return;
 
+    // 删除节点
+    node->removeChildNode(name);
+
+    // 更新显示
+    m_pTreeView->clearSelection();
+    m_pTreeView->doItemsLayout();
 }

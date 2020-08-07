@@ -18,6 +18,15 @@ public:
 private:
     UINodeTreeViewModel* m_pModel = nullptr;
     UINodeTreeDelegate* m_pDelegate = nullptr;
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
+private slots:
+    // 响应节点被选中
+    void onItemSelectedChanged(void);
+    // 节点的选择发生改变
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 };
 
 #endif

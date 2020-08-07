@@ -19,6 +19,7 @@ UICanvasView::UICanvasView(QWidget* parent)
     // 初始化CanvasManager
     UICanvasItemManager::createCanvasManager();
     UICanvasItemManager::setCurrentIndex(0);
+    g_currentCanvasManager->setCurrentCanvasView(this);
 
     this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
@@ -203,6 +204,21 @@ NDNodeBase* UICanvasView::getCurrentSelectedNode(void)
     }
 
     return m_pScene->getCurrentNode();
+}
+
+QList<NDNodeBase*> UICanvasView::getCurrentSelectedNodes(void)
+{
+    QList<NDNodeBase*> nodes;
+
+    QList<QGraphicsItem *> items = m_pScene->selectedItems();
+    for (auto iter = items.begin(); iter != items.end(); ++iter)
+    {
+        UICanvasItemBase* canvasItem = qgraphicsitem_cast<UICanvasItemBase*>(*iter);
+        if (canvasItem)
+            nodes << canvasItem->getCurrentNode();
+    }
+
+    return nodes;
 }
 
 NDNodeBase* UICanvasView::getCurrentSceneNode(void)

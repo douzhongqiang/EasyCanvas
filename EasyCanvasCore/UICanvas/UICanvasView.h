@@ -46,6 +46,7 @@ public:
 
     // 获取当前选中的Item的节点
     NDNodeBase* getCurrentSelectedNode(void);
+    QList<NDNodeBase*> getCurrentSelectedNodes(void);
     // 获取当前场景根节点
     NDNodeBase* getCurrentSceneNode(void);
 

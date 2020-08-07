@@ -10,6 +10,7 @@
 
 class NDNodeBase;
 class UICanvasItemBase;
+class UICanvasView;
 
 #define g_currentCanvasManager UICanvasItemManager::getCurrentCanvasManager()
 
@@ -48,12 +49,21 @@ public:
     // 删除节点
     void deleteCanvasItem(NDNodeBase* node);
     void deleteCanvasItem(const QString& nodeName);
+    void deleteCanvasItems(const QStringList& nodeNames);
+    // 替换节点名称
+    bool changedNodeName(const QString& srcName, const QString& destName);
     // 获取所有节点名称
     QStringList getAllNodeNames(void);
     // 查找节点
     NDNodeBase* getNode(const QString& name);
     // 清除所有
     void cleanAll(void);
+    // 设置当前的选择列表
+    void setSelectedNodes(const QStringList& nodeNames);
+
+    // 设置/获取当前的Canvas
+    void setCurrentCanvasView(UICanvasView* canvasView);
+    UICanvasView* getCurrentCanvasView(void);
 
     // 获取当前所有节点类型数目
     int getNodeCounts(void);
@@ -85,8 +95,12 @@ private:
     static QVector<UICanvasItemManager*> m_canvasList;
     static int m_nCurrentIndex;
 
+    // 当前的CanvasView
+    UICanvasView* m_pCanvasView = nullptr;
+
 signals:
     void addedNode(int type, const QString& nodeName);
+    void deletedNode(int type, const QString& nodeName);
 };
 
 #endif

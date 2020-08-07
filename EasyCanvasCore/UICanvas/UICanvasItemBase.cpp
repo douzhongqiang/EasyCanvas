@@ -14,6 +14,7 @@
 #include "NDRealAttribute.h"
 #include "NDIntAttribute.h"
 #include "RALLBlockSignal.h"
+#include "UICanvasItemManager.h"
 
 QImage UICanvasItemBase::m_closeIcon;
 QImage UICanvasItemBase::m_resizeIcon;
@@ -136,7 +137,10 @@ void UICanvasItemBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (itemRect.contains(pos))
         m_itemOper = t_move;
     else if (g_utilTool->getDistance(pos, outLintRect.topRight()) <= m_nEllipseWidth)
-        this->deleteLater();
+    {
+        g_currentCanvasManager->deleteCanvasItem(m_pNode);
+        return;
+    }
     else if (g_utilTool->getDistance(pos, outLintRect.bottomLeft()) <= m_nEllipseWidth)
         m_itemOper = t_rotate;
     else if (g_utilTool->getDistance(pos, outLintRect.bottomRight()) <= m_nEllipseWidth)

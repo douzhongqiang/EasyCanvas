@@ -7,6 +7,7 @@
 #include "UICanvasAudioItem.h"
 #include "UICanvasPathItem.h"
 #include "UICanvasImageItem.h"
+#include "UICanvasView.h"
 
 QVector<UICanvasItemManager*> UICanvasItemManager::m_canvasList;
 int UICanvasItemManager::m_nCurrentIndex = -1;
@@ -115,10 +116,12 @@ UICanvasItemBase* UICanvasItemManager::createCanvasItem(CanvasItemType type)
     if (pItem == nullptr)
         return pItem;
 
-    // 设置节点名称
+    // 设置节点本身的屬性
     NDNodeBase* pNode = pItem->getCurrentNode();
     QString nodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
     pNode->setNodeName(nodeName);
+    pNode->setNodeType((int)type);
+
     // 添加到哈希表中
     m_nameHash.insert(nodeName, pItem);
 
@@ -135,12 +138,54 @@ void UICanvasItemManager::deleteCanvasItem(NDNodeBase* node)
         return;
 
     QString name = node->getNodeName();
-    m_nameHash.remove(name);
+    deleteCanvasItem(name);
 }
 
 void UICanvasItemManager::deleteCanvasItem(const QString& nodeName)
 {
+    auto iter = m_nameHash.find(nodeName);
+    if (iter == m_nameHash.end())
+        return;
+
+    // 刪除
+    UICanvasItemBase* canvasItem = iter.value();
+    int type = canvasItem->getCurrentNode()->getNodeType();
+    canvasItem->deleteLater();
+
+    // 移除
     m_nameHash.remove(nodeName);
+
+    emit deletedNode(type, nodeName);
+}
+
+void UICanvasItemManager::deleteCanvasItems(const QStringList& nodeNames)
+{
+    foreach (const QString& nodeName, nodeNames)
+    {
+        deleteCanvasItem(nodeName);
+    }
+}
+
+bool UICanvasItemManager::changedNodeName(const QString& srcName, const QString& destName)
+{
+    // 已存在该节点
+    if (m_nameHash.find(destName) != m_nameHash.end())
+        return false;
+
+    // 查找节点
+    auto iter = m_nameHash.find(srcName);
+    if (iter == m_nameHash.end())
+        return false;
+
+    // 设置节点名字
+    UICanvasItemBase* canvasItem = iter.value();
+    NDNodeBase* pNode = canvasItem->getCurrentNode();
+    pNode->setNodeName(destName);
+
+    m_nameHash.remove(srcName);
+    m_nameHash.insert(destName, canvasItem);
+
+    return true;
 }
 
 QStringList UICanvasItemManager::getAllNodeNames(void)
@@ -204,4 +249,34 @@ void UICanvasItemManager::setCurrentIndex(int index)
 int UICanvasItemManager::getCurrentIndex(void)
 {
     return m_nCurrentIndex;
+}
+
+// 设置当前的Canvas
+void UICanvasItemManager::setCurrentCanvasView(UICanvasView* canvasView)
+{
+    m_pCanvasView = canvasView;
+}
+
+UICanvasView* UICanvasItemManager::getCurrentCanvasView(void)
+{
+    return m_pCanvasView;
+}
+
+void UICanvasItemManager::cleanAll(void)
+{
+
+}
+
+void UICanvasItemManager::setSelectedNodes(const QStringList& nodeNames)
+{
+    m_pCanvasView->cleanAllSelected();
+
+    foreach(const QString& nodeName, nodeNames)
+    {
+        auto iter = m_nameHash.find(nodeName);
+        if (iter == m_nameHash.end())
+            continue;
+
+        (*iter)->setSelected(true);
+    }
 }

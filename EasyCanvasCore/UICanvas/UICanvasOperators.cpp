@@ -2,6 +2,7 @@
 #include "UICanvasView.h"
 #include "UICanvasPathItem.h"
 #include "UICanvas/UICanvasItemManager.h"
+#include "UICanvasItemBase.h"
 #include <QMouseEvent>
 
 UICanvasOperBase::UICanvasOperBase(UICanvasView* view)
@@ -106,7 +107,15 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
         // 删除选中的元素
         auto selectedItems = m_pCanvasView->scene()->selectedItems();
         for (auto item : selectedItems)
-            delete item;
+        {
+            UICanvasItemBase* canvasItem = dynamic_cast<UICanvasItemBase*>(item);
+            if (canvasItem == nullptr)
+                continue;
+
+            // 刪除
+            NDNodeBase* node = canvasItem->getCurrentNode();
+            g_currentCanvasManager->deleteCanvasItem(node);
+        }
     }
 
     return false;

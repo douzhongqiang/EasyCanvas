@@ -1,9 +1,9 @@
 #include "UINodeItem.h"
 
 UINodeItem::UINodeItem(UINodeItem* parentItem)
-    :m_pParentItem(parentItem)
+    :QObject(parentItem)
 {
-
+    m_pParentItem = parentItem;
 }
 
 UINodeItem::~UINodeItem()
@@ -14,8 +14,26 @@ UINodeItem::~UINodeItem()
 // 添加子节点
 void UINodeItem::appendChildNode(UINodeItem* nodeItem)
 {
-    nodeItem->m_pParentItem = this;
+    nodeItem->setParentNode(this);
     m_childItems.append(nodeItem);
+}
+
+void UINodeItem::removeChildNode(const QString& nodeName)
+{
+    UINodeItem* pNodeItem = nullptr;
+    for (auto iter = m_childItems.begin(); iter != m_childItems.end(); ++iter)
+    {
+        if ((*iter)->getName() == nodeName)
+        {
+            pNodeItem = *iter;
+            pNodeItem->setParentNode(nullptr);
+            m_childItems.erase(iter);
+            break;
+        }
+    }
+
+//    if (pNodeItem)
+//        pNodeItem->deleteLater();
 }
 
 UINodeItem* UINodeItem::getChildNode(int index)
@@ -30,6 +48,7 @@ UINodeItem* UINodeItem::getChildNode(int index)
 void UINodeItem::setParentNode(UINodeItem* node)
 {
     m_pParentItem = node;
+    this->setParent(m_pParentItem);
 }
 
 UINodeItem* UINodeItem::getParentNode(void)
