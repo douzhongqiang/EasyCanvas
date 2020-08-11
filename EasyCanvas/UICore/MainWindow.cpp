@@ -10,10 +10,12 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 #include "NDNodeBase.h"
 #include "UIAboutMeDialog.h"
 #include "PythonWrapCore.h"
 #include "UICanvas/UICanvasItemManager.h"
+#include "Scheme/CanvasSchemeManager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -102,9 +104,26 @@ void MainWindow::initMenuBar(void)
     // 添加文件菜单
     QMenu* fileMenu = new QMenu(tr("File"));
     menuBar->addMenu(fileMenu);
-    QAction* saveAction = new QAction(tr("Save As"));
+    // 新建
+    QAction* newAction = new QAction(tr("New"));
+    fileMenu->addAction(newAction);
+    QObject::connect(newAction, &QAction::triggered, this, &MainWindow::onClickedNew);
+    // 打开
+    QAction* openAction = new QAction(tr("Open"));
+    fileMenu->addAction(openAction);
+    QObject::connect(openAction, &QAction::triggered, this, &MainWindow::onClickedOpen);
+    // 保存
+    QAction* saveAction = new QAction(tr("Save"));
     fileMenu->addAction(saveAction);
-    QObject::connect(saveAction, &QAction::triggered, this, &MainWindow::onClickedSaveAs);
+    QObject::connect(saveAction, &QAction::triggered, this, &MainWindow::onClickedSava);
+    // 另存为
+    QAction* saveAsAction = new QAction(tr("SaveAs"));
+    fileMenu->addAction(saveAsAction);
+    QObject::connect(saveAsAction, &QAction::triggered, this, &MainWindow::onClickedSaveAs);
+    // 导出为图片
+    QAction* saveImageAction = new QAction(tr("Save To Image"));
+    fileMenu->addAction(saveImageAction);
+    QObject::connect(saveImageAction, &QAction::triggered, this, &MainWindow::onClickedSaveToImage);
 
     // 添加编辑菜单
     QMenu* editMenu = new QMenu(tr("Edit"));
@@ -189,7 +208,7 @@ void MainWindow::onClickedTextButton(void)
     m_pCanvasView->createTextItem();
 }
 
-void MainWindow::onClickedSaveAs(void)
+void MainWindow::onClickedSaveToImage(void)
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), "./EasyCanvas.png", tr("Images (*.png *.jpg *.bmp)"));
     if (fileName.isEmpty())
@@ -199,6 +218,31 @@ void MainWindow::onClickedSaveAs(void)
 
     QMessageBox message;
     message.about(this, tr("Save Info"), tr("Save Successed!"));
+}
+
+void MainWindow::onClickedNew(void)
+{
+
+}
+
+void MainWindow::onClickedOpen(void)
+{
+
+}
+
+void MainWindow::onClickedSava(void)
+{
+
+}
+
+void MainWindow::onClickedSaveAs(void)
+{
+    QString schemeName = QInputDialog::getText(this, tr("Please Input Scheme Name"), tr("Please Input Scheme Name"));
+    if (schemeName.isEmpty())
+        return;
+
+    g_CanvasSchemeManager->setCurrentSchemeName(schemeName);
+    g_CanvasSchemeManager->saveScheme();
 }
 
 void MainWindow::onClickedAboutMe(void)

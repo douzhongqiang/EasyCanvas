@@ -30,10 +30,15 @@ public:
     void setName(const QString& name);
     QString getName(void);
 
+    // 设置/获取属性组的显示名称
+    void setDisplayName(const QString& name);
+    QString getDisplayName(void);
+
 private:
     NDNodeBase* m_pParentNode = nullptr;
     QList<NDAttributeBase*> m_attributes;
     QString m_groupName;
+    QString m_displayName;
 };
 
 #endif

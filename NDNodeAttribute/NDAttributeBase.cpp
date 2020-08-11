@@ -116,3 +116,41 @@ NDAttributeBase* NDAttributeBase::createAttribute(const QString& name, Attribute
     attribute->setName(name);
     return attribute;
 }
+
+QVariant NDAttributeBase::getCurrentValue(NDAttributeBase* pAttribute)
+{
+    AttributeType attrType = pAttribute->Type();
+
+    switch (attrType)
+    {
+    case t_bool:
+    {
+        NDBoolAttribute* pValueAttr = dynamic_cast<NDBoolAttribute*>(pAttribute);
+        return pValueAttr->getCurrentValue();
+    }
+    case t_int:
+    {
+        NDIntAttribute* pValueAttr = dynamic_cast<NDIntAttribute*>(pAttribute);
+        return pValueAttr->getCurrentValue();
+    }
+    case t_qreal:
+    {
+        NDRealAttribute* pValueAttr = dynamic_cast<NDRealAttribute*>(pAttribute);
+        return pValueAttr->getCurrentValue();
+    }
+    case t_string:
+    {
+        NDStringAttribute* pValueAttr = dynamic_cast<NDStringAttribute*>(pAttribute);
+        return pValueAttr->getCurrentValue();
+    }
+    case t_color:
+    {
+        NDColorAttribute* pValueAttr = dynamic_cast<NDColorAttribute*>(pAttribute);
+        return pValueAttr->getCurrentValue();
+    }
+    default:
+        break;
+    }
+
+    return QVariant();
+}

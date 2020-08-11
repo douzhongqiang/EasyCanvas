@@ -90,7 +90,7 @@ QWidget* UINodeAttrControl::createAttributeGroupControl(NDAttributeGroup* group)
 
     // 添加group control
     UICustomGroupControl* groupControl = new UICustomGroupControl;
-    groupControl->setTitleText(group->getName());
+    groupControl->setTitleText(group->getDisplayName());
 
     // 添加属性控件
     QList<NDAttributeBase*> attributes;

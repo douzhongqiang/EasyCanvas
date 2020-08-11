@@ -73,3 +73,13 @@ QString NDAttributeGroup::getName(void)
 {
     return m_groupName;
 }
+
+void NDAttributeGroup::setDisplayName(const QString& name)
+{
+    m_displayName = name;
+}
+
+QString NDAttributeGroup::getDisplayName(void)
+{
+    return m_displayName;
+}

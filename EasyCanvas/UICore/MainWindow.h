@@ -40,8 +40,13 @@ private slots:
 
     void onSelectedItemChanged(void);
 
-    // 保存
-    void onClickedSaveAs(void);
+    // 文件相关
+    void onClickedNew(void);                 // 新建场景
+    void onClickedOpen(void);                // 打开场景
+    void onClickedSava(void);                // 保存场景
+    void onClickedSaveAs(void);              // 另存为
+    void onClickedSaveToImage(void);         // 保存为图片
+
     // 关于我
     void onClickedAboutMe(void);
 

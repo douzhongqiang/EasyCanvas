@@ -303,46 +303,46 @@ void UICanvasItemBase::initNodeBase(void)
 
     // 添加属性组
     QString attributeGroupString = tr("Base Attribute");
-    m_pNode->addAttributeGroup(attributeGroupString);
+    NDAttributeGroup* pGroup = m_pNode->addAttributeGroup("BaseAttr", attributeGroupString);
 
     // X坐标
     m_pXPostionAttribute = new NDRealAttribute;
     m_pXPostionAttribute->setDisplayName(tr("X Postion: "));
     m_pXPostionAttribute->setName("xPt");
     m_pXPostionAttribute->setValueRange(0, 5000);
-    m_pNode->addAttribute(attributeGroupString, m_pXPostionAttribute);
+    m_pNode->addAttribute(pGroup, m_pXPostionAttribute);
     // Y坐标
     m_pYPostionAttribute = new NDRealAttribute;
     m_pYPostionAttribute->setDisplayName(tr("Y Postion: "));
     m_pYPostionAttribute->setName("yPt");
     m_pYPostionAttribute->setValueRange(0, 5000);
-    m_pNode->addAttribute(attributeGroupString, m_pYPostionAttribute);
+    m_pNode->addAttribute(pGroup, m_pYPostionAttribute);
     // Z坐标
     m_pZPostionAttribute = new NDRealAttribute;
     m_pZPostionAttribute->setDisplayName(tr("Z Postion: "));
     m_pZPostionAttribute->setName("zPt");
     m_pZPostionAttribute->setValueRange(0, 10);
-    m_pNode->addAttribute(attributeGroupString, m_pZPostionAttribute);
+    m_pNode->addAttribute(pGroup, m_pZPostionAttribute);
 
     // 宽度
     m_pWidthAttribute = new NDIntAttribute;
     m_pWidthAttribute->setDisplayName(tr("width: "));
     m_pWidthAttribute->setName("width");
     m_pWidthAttribute->setValueRange(10, 5000);
-    m_pNode->addAttribute(attributeGroupString, m_pWidthAttribute);
+    m_pNode->addAttribute(pGroup, m_pWidthAttribute);
     // 高度
     m_pHeightAttribute = new NDIntAttribute;
     m_pHeightAttribute->setDisplayName(tr("height: "));
     m_pHeightAttribute->setName("height");
     m_pHeightAttribute->setValueRange(10, 5000);
-    m_pNode->addAttribute(attributeGroupString, m_pHeightAttribute);
+    m_pNode->addAttribute(pGroup, m_pHeightAttribute);
 
     // 旋转
     m_pRotateAttribute = new NDRealAttribute;
     m_pRotateAttribute->setDisplayName(tr("Rotate Angle: "));
     m_pRotateAttribute->setName("rotate");
     m_pRotateAttribute->setValueRange(0, 360);
-    m_pNode->addAttribute(attributeGroupString, m_pRotateAttribute);
+    m_pNode->addAttribute(pGroup, m_pRotateAttribute);
 
     // 连接信号和槽
     QObject::connect(m_pXPostionAttribute, &NDRealAttribute::valueChanged, this, &UICanvasItemBase::onXPostionAttributeValueChanged);

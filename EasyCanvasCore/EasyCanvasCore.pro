@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += widgets multimedia
+QT       += widgets multimedia sql
 
 TARGET = EasyCanvasCore
 TEMPLATE = lib
@@ -42,6 +42,8 @@ INCLUDEPATH += $$PWD/../thirdLibs/ffmpeg/include
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        Scheme/CanvasSchemeManager.cpp \
+        Scheme/SQLCore.cpp \
         UICanvas/UICanvasArrows.cpp \
         UICanvas/UICanvasAudioItem.cpp \
         UICanvas/UICanvasEllipseItem.cpp \
@@ -63,6 +65,9 @@ SOURCES += \
         UndoCmd/UndoCmdCore.cpp
 
 HEADERS += \
+        Scheme/CanvasSchemeManager.h \
+        Scheme/SQLCore.h \
+        Scheme/SchemeDataInfo.h \
         UICanvas/UICanvasArrows.h \
         UICanvas/UICanvasAudioItem.h \
         UICanvas/UICanvasEllipseItem.h \

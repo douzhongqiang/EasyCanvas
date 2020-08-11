@@ -67,7 +67,7 @@ public:
 
     // 获取当前所有节点类型数目
     int getNodeCounts(void);
-    // 获取某种节点类别的数目
+    // 获取某种节点类别的数目(当前索引的计数)
     int getNodeCounts(CanvasItemType type);
 
     // 获取节点类别的名字

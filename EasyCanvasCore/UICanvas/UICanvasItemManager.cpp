@@ -31,6 +31,8 @@ QString UICanvasItemManager::getTypeName(CanvasItemType type)
 {
     switch (type)
     {
+    case t_CanvasItem:
+        return "CanvasNode";
     case t_RectItem:
         return "RectNode";
     case t_TextItem:

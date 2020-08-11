@@ -117,11 +117,24 @@ void NDNodeBase::addAttributeGroup(NDAttributeGroup* group)
     m_groupList.append(group);
 }
 
-void NDNodeBase::addAttributeGroup(const QString& name)
+NDAttributeGroup* NDNodeBase::addAttributeGroup(const QString& name)
 {
     NDAttributeGroup* group = new NDAttributeGroup;
     group->setName(name);
+    group->setDisplayName(name);
     addAttributeGroup(group);
+
+    return group;
+}
+
+NDAttributeGroup* NDNodeBase::addAttributeGroup(const QString& name, const QString& displayName)
+{
+    NDAttributeGroup* group = new NDAttributeGroup;
+    group->setName(name);
+    group->setDisplayName(displayName);
+    addAttributeGroup(group);
+
+    return group;
 }
 
 // 删除属性组

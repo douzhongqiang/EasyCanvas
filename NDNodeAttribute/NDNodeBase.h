@@ -40,7 +40,8 @@ public:
 
     // 添加属性组
     void addAttributeGroup(NDAttributeGroup* group);
-    void addAttributeGroup(const QString& name);
+    NDAttributeGroup* addAttributeGroup(const QString& name);
+    NDAttributeGroup* addAttributeGroup(const QString& name, const QString& displayName);
     // 删除属性组
     void deleteAttributeGroup(NDAttributeGroup* group);
     void deleteAttributeGroup(const QString& name);
