@@ -3,9 +3,14 @@
 软件绿色版下载地址：
 
 链接：https://pan.baidu.com/s/1r2zKmt4ID_7p0V8Fm7e7cQ 提取码：m6n1
+
 视频演示地址：https://www.bilibili.com/video/BV18K411L7Ca/
 
 **注意：** 这里使用的是64位的FFmpeg库，如果编译的时候报错，请编译成64位的版本或者自行替换成32位的FFMpeg库。
+
+**由于DLL库文件太大，会导致Github仓库克隆失败，可以使用如下链接下载DLL库**
+
+链接：https://pan.baidu.com/s/13jPRbcDB_u08ad5g8Fu6FQ    提取码：2n5b
 
 # 1. 基本功能
 
