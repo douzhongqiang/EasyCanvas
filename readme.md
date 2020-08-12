@@ -6,11 +6,17 @@
 
 视频演示地址：https://www.bilibili.com/video/BV18K411L7Ca/
 
-**注意：** 这里使用的是64位的FFmpeg库，如果编译的时候报错，请编译成64位的版本或者自行替换成32位的FFMpeg库。
+**注意：** 
 
-**由于DLL库文件太大，会导致Github仓库克隆失败，可以使用如下链接下载DLL库**
+1. 这里使用的是64位的FFmpeg库，如果编译的时候报错，请编译成64位的版本或者自行替换成32位的FFMpeg库。
+
+2. **由于DLL库文件太大，会导致Github仓库克隆失败，可以使用如下链接下载DLL库**
 
 链接：https://pan.baidu.com/s/13jPRbcDB_u08ad5g8Fu6FQ    提取码：2n5b
+
+3. **如果Git仓库克隆失败，可以使用如下链接获取源码，后可直接更新代码。**
+
+链接：https://pan.baidu.com/s/1Yk31L_cNcGml7oYo6ryGgg   提取码：3bll
 
 # 1. 基本功能
 
