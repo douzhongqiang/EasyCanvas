@@ -23,7 +23,7 @@ OBJECTS_DIR += $$PWD/../CustomControls/temp
 CONFIG += c++11
 
 LIBS += -L$$PWD/../bin -lCustomWidgets
-INCLUDEPATH += $$PWD/../bin
+INCLUDEPATH += $$PWD/../CustomWidgets
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.

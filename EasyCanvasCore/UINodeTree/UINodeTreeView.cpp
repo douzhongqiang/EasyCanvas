@@ -5,6 +5,7 @@
 #include "UICanvas/UICanvasView.h"
 #include "NDNodeBase.h"
 #include <QHeaderView>
+#include <QKeyEvent>
 
 UINodeTreeView::UINodeTreeView(QWidget* parent)
     :QTreeView(parent)
