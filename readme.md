@@ -12,11 +12,11 @@
 
 2. **由于DLL库文件太大，会导致Github仓库克隆失败，可以使用如下链接下载DLL库**
 
-链接：https://pan.baidu.com/s/13jPRbcDB_u08ad5g8Fu6FQ    提取码：2n5b
+链接：https://pan.baidu.com/s/1B9hN8fEKvBQN7X-HqBlLZw   提取码：ubuq
 
 3. **如果Git仓库克隆失败，可以使用如下链接获取源码，后可直接更新代码。**
 
-链接：https://pan.baidu.com/s/1Yk31L_cNcGml7oYo6ryGgg   提取码：3bll
+链接：https://pan.baidu.com/s/1qn-L1Vc3cFSUdf8Rx5YLiA   提取码：0rsf
 
 # 1. 基本功能
 
