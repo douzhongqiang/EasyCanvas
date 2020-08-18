@@ -44,6 +44,17 @@ UINodeItem* UINodeItem::getChildNode(int index)
     return m_childItems[index];
 }
 
+UINodeItem* UINodeItem::getChildNode(const QString& nodeName)
+{
+    for (auto iter = m_childItems.begin(); iter != m_childItems.end(); ++iter)
+    {
+        if ((*iter)->getName() == nodeName)
+            return *iter;
+    }
+
+    return nullptr;
+}
+
 // 设置/获取父节点
 void UINodeItem::setParentNode(UINodeItem* node)
 {

@@ -16,6 +16,8 @@
 #include "PythonWrapCore.h"
 #include "UICanvas/UICanvasItemManager.h"
 #include "Scheme/CanvasSchemeManager.h"
+#include "Scheme/UISchemeManagerWidget.h"
+#include "Scheme/UISchemeManagerDialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -227,7 +229,8 @@ void MainWindow::onClickedNew(void)
 
 void MainWindow::onClickedOpen(void)
 {
-
+    UISchemeManagerDialog pSchemeManagerWidget(this);
+    pSchemeManagerWidget.exec();
 }
 
 void MainWindow::onClickedSava(void)

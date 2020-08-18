@@ -29,6 +29,9 @@ public:
     // 获取当前的节点
     NDNodeBase* getCurrentNode(void) const;
 
+    // 拷贝另一元素到自身数据中
+    virtual void copyFromItem(UICanvasItemBase* pItem);
+
     // 设置改变大小相关属性
     void setItemResizeable(bool resizeable);
     void setItemResizeRatio(bool resizeRation, qreal rationValue);

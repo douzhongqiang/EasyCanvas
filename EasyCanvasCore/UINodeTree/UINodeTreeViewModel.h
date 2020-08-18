@@ -41,6 +41,7 @@ private:
 private slots:
     void onAddedNodeItem(int nodeType, const QString& name);
     void onDeleteNodeItem(int nodeType, const QString& name);
+    void onChangeNodeItemName(int nodeType, const QString& srcName, const QString& destName);
 };
 
 #endif

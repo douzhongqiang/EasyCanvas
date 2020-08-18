@@ -8,6 +8,7 @@
 #include "UICanvasPathItem.h"
 #include "UICanvasImageItem.h"
 #include "UICanvasView.h"
+#include "UndoCmd/UndoCmdCore.h"
 
 QVector<UICanvasItemManager*> UICanvasItemManager::m_canvasList;
 int UICanvasItemManager::m_nCurrentIndex = -1;
@@ -20,6 +21,8 @@ UICanvasItemManager::UICanvasItemManager(QObject* parent)
         m_countMap[(CanvasItemType)var].count = 0;
         m_countMap[(CanvasItemType)var].iconPixmap = getTypeIcon((CanvasItemType)var);
     }
+
+    m_pUndoCmdCore = new UndoCmdCore(this);
 }
 
 UICanvasItemManager::~UICanvasItemManager()
@@ -76,61 +79,119 @@ QIcon UICanvasItemManager::getTypeIcon(CanvasItemType type)
     return QIcon();
 }
 
-UICanvasItemBase* UICanvasItemManager::createCanvasItem(CanvasItemType type)
+QSharedPointer<UICanvasItemBase> UICanvasItemManager::createCanvasItem(CanvasItemType type, const QString& nodeName, bool isAdded)
 {
-    UICanvasItemBase* pItem = nullptr;
+    m_pCanvasItemBase.reset();
+
     switch (type)
     {
     case t_RectItem:
     {
-        pItem = new UICanvasRectItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasRectItem);
         break;
     }
     case t_TextItem:
     {
-        pItem = new UICanvasTextItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasTextItem);
         break;
     }
     case t_EllipseItem:
     {
-        pItem = new UICanvasEllipseItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasEllipseItem);
         break;
     }
     case t_ImageItem:
     {
-        pItem = new UICanvasImageItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasImageItem);
         break;
     }
     case t_PathItem:
     {
-        pItem = new UICanvasPathItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasPathItem);
         break;
     }
     case t_AudioItem:
     {
-        pItem = new UICanvasAudioItem;
+        m_pCanvasItemBase = QSharedPointer<UICanvasItemBase>(new UICanvasAudioItem);
         break;
     }
     default:
         break;
     }
 
-    if (pItem == nullptr)
-        return pItem;
+    if (m_pCanvasItemBase == nullptr || !isAdded)
+        return m_pCanvasItemBase;
 
-    // 设置节点本身的屬性
-    NDNodeBase* pNode = pItem->getCurrentNode();
-    QString nodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
-    pNode->setNodeName(nodeName);
+    // 设置位置和选中
+    m_pCanvasView->cleanAllSelected();
+    m_pCanvasItemBase->setSelected(true);
+
+    // 获取属性名
+    QString tempNodeName = nodeName;
+    if (tempNodeName.isEmpty() || m_nameHash.find(tempNodeName) != m_nameHash.end())
+    {
+        // 自动生成节点名
+        do {
+            tempNodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
+        }while(m_nameHash.find(tempNodeName) != m_nameHash.end());
+    }
+
+    // 设置属性名和类型
+    NDNodeBase* pNode = m_pCanvasItemBase->getCurrentNode();
+    pNode->setNodeName(tempNodeName);
     pNode->setNodeType((int)type);
 
+    m_pCanvasView->addToScene(m_pCanvasItemBase.data());
+
     // 添加到哈希表中
-    m_nameHash.insert(nodeName, pItem);
+    m_nameHash.insert(tempNodeName, m_pCanvasItemBase);
 
     // 发送添加信号
-    emit addedNode(type, nodeName);
+    emit addedNode(type, tempNodeName);
 
-    return pItem;
+    return m_pCanvasItemBase;
+}
+
+void UICanvasItemManager::addCanvasItem(QSharedPointer<UICanvasItemBase> pCanvasItem)
+{
+    if (pCanvasItem == nullptr)
+        return;
+
+    CanvasItemType type = (CanvasItemType)pCanvasItem->getCurrentNode()->getNodeType();
+
+    // 获取属性名
+    QString tempNodeName = pCanvasItem->getCurrentNode()->getNodeName();
+    if (tempNodeName.isEmpty() || m_nameHash.find(tempNodeName) != m_nameHash.end())
+    {
+        // 自动生成节点名
+        do {
+            tempNodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
+        }while(m_nameHash.find(tempNodeName) != m_nameHash.end());
+    }
+
+    // 设置属性名和类型
+    NDNodeBase* pNode = pCanvasItem->getCurrentNode();
+    pNode->setNodeName(tempNodeName);
+
+    m_pCanvasView->addToScene(pCanvasItem.data());
+
+    // 添加到哈希表中
+    m_nameHash.insert(tempNodeName, pCanvasItem);
+
+    // 发送添加信号
+    emit addedNode(pCanvasItem->getCurrentNode()->getNodeType(), tempNodeName);
+}
+
+QSharedPointer<UICanvasItemBase> UICanvasItemManager::createCanvasItemByCmd(CanvasItemType type)
+{
+    m_pUndoCmdCore->runCreateCmd((int)type);
+    return m_pCanvasItemBase;
+}
+
+
+void UICanvasItemManager::deleteCanvasItemByCmd(const QStringList& nodeName)
+{
+    m_pUndoCmdCore->runDeleteCmd(nodeName);
 }
 
 // 删除节点
@@ -150,9 +211,11 @@ void UICanvasItemManager::deleteCanvasItem(const QString& nodeName)
         return;
 
     // 刪除
-    UICanvasItemBase* canvasItem = iter.value();
+    auto canvasItem = iter.value();
     int type = canvasItem->getCurrentNode()->getNodeType();
-    canvasItem->deleteLater();
+
+    // 从场景中移除元素
+    m_pCanvasView->removeFromScene(canvasItem.data());
 
     // 移除
     m_nameHash.remove(nodeName);
@@ -168,6 +231,25 @@ void UICanvasItemManager::deleteCanvasItems(const QStringList& nodeNames)
     }
 }
 
+void UICanvasItemManager::changedNodeNameCmd(const QString& srcName, const QString& destName)
+{
+    m_pUndoCmdCore->runChangeNameCmd(srcName, destName);
+}
+
+bool UICanvasItemManager::isCanChangedName(const QString& srcName, const QString& destName)
+{
+    // 已存在该节点
+    if (m_nameHash.find(destName) != m_nameHash.end())
+        return false;
+
+    // 查找节点
+    auto iter = m_nameHash.find(srcName);
+    if (iter == m_nameHash.end())
+        return false;
+
+    return true;
+}
+
 bool UICanvasItemManager::changedNodeName(const QString& srcName, const QString& destName)
 {
     // 已存在该节点
@@ -180,12 +262,15 @@ bool UICanvasItemManager::changedNodeName(const QString& srcName, const QString&
         return false;
 
     // 设置节点名字
-    UICanvasItemBase* canvasItem = iter.value();
+    auto canvasItem = iter.value();
     NDNodeBase* pNode = canvasItem->getCurrentNode();
     pNode->setNodeName(destName);
 
     m_nameHash.remove(srcName);
     m_nameHash.insert(destName, canvasItem);
+
+    // 发送名字更改信号
+    emit changeNodeName(pNode->getNodeType(), srcName, destName);
 
     return true;
 }
@@ -202,6 +287,15 @@ NDNodeBase* UICanvasItemManager::getNode(const QString& name)
         return nullptr;
 
     return (*iter)->getCurrentNode();
+}
+
+QSharedPointer<UICanvasItemBase> UICanvasItemManager::getCanvasItem(const QString& name)
+{
+    const auto iter = m_nameHash.find(name);
+    if (iter == m_nameHash.end())
+        return nullptr;
+
+    return *iter;
 }
 
 int UICanvasItemManager::getNodeCounts(void)
@@ -281,4 +375,15 @@ void UICanvasItemManager::setSelectedNodes(const QStringList& nodeNames)
 
         (*iter)->setSelected(true);
     }
+}
+
+// 撤銷和重做相关
+void UICanvasItemManager::redo(void)
+{
+    m_pUndoCmdCore->redo();
+}
+
+void UICanvasItemManager::undo(void)
+{
+    m_pUndoCmdCore->undo();
 }

@@ -6,6 +6,7 @@
 #include "SchemeDataInfo.h"
 
 class QSqlQuery;
+class NDNodeBase;
 class SQLCore : public QObject
 {
     Q_OBJECT
@@ -26,13 +27,15 @@ public:
 
     // 查找
     // 获取方案列表
-    void getSchemeInfoList(QList<SchemeDataInfo::SchemeInfo>& infos);
+    void getSchemeInfoList(QSet<SchemeDataInfo::SchemeInfo>& infos);
     // 插入方案数据
     void insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info);
     // 编辑方案数据
     void editSchemeInfo(const QString& schemeName, const SchemeDataInfo::SchemeInfo& info);
     // 删除方案数据
     void deleteSchemeInfo(const QString& schemeName);
+    // 更改方案名称
+    void changedSchemeName(const QString& schemeName, const QString& destName);
 
     // 加载方案
     void loadScheme(const QString& schemeName);
@@ -52,6 +55,14 @@ private:
 
     // 获取当前的索引计数，组合字符串
     QString getCurrentIndexCountString(void);
+
+    // 设置基本属性
+    void setBaseAttr(const QString& schemeName, NDNodeBase* pNode, int index);
+    // 设置扩展属性
+    void setExtendAttr(const QString& schemeName, NDNodeBase* pNode, int canvasType, int index);
+
+    // 颜色字符串转颜色
+    QColor string2Color(const QString& colorString);
 };
 
 #endif

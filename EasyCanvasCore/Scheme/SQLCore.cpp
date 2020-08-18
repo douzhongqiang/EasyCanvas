@@ -7,6 +7,7 @@
 #include "NDNodeBase.h"
 #include "NDAttributeGroup.h"
 #include "NDAttributeBase.h"
+#include "UICanvas/UICanvasItemBase.h"
 
 SQLCore::SQLCore(QObject* parent)
     :QObject(parent)
@@ -84,8 +85,11 @@ void SQLCore::createSchemeManagerTable(void)
     QString schemeManagerString("CREATE TABLE IF NOT EXISTS %1 ("
                                 "schemeName VARCHAR(200) PRIMARY KEY NOT NULL,"
                                 "createTime DATATIME NOT NULL,"
-                                "editTime DATATIME NOT NULL, "
-                                "indexCount VARCHAR(60) NOT NULL)");
+                                "editTime DATATIME NOT NULL,"
+                                "indexCount VARCHAR(60) NOT NULL,"
+                                "imageWidth INT, "
+                                "imageHeight INT,"
+                                "image MEDIUMBLOL)");
 
     schemeManagerString = schemeManagerString.arg(m_schemeTableName);
     bool result = m_pSqlQuery->exec(schemeManagerString);
@@ -397,10 +401,10 @@ void SQLCore::cleanData(const QString& schemenName)
     }
 }
 
-void SQLCore::getSchemeInfoList(QList<SchemeDataInfo::SchemeInfo>& infos)
+void SQLCore::getSchemeInfoList(QSet<SchemeDataInfo::SchemeInfo>& infos)
 {
     infos.clear();
-    QSqlQuery query(QString("SELECT schemeName, createTime, editTime FROM %1").arg(m_schemeTableName));
+    QSqlQuery query(QString("SELECT schemeName, createTime, editTime, imageWidth, imageHeight, image FROM %1").arg(m_schemeTableName));
     while (query.next())
     {
         SchemeDataInfo::SchemeInfo info;
@@ -409,7 +413,22 @@ void SQLCore::getSchemeInfoList(QList<SchemeDataInfo::SchemeInfo>& infos)
         info.createTime = query.value("createTime").toDateTime();
         info.editTime = query.value("editTime").toDateTime();
 
-        infos << info;
+        // 设置图像
+        int width = query.value("imageWidth").toInt();
+        int height = query.value("imageHeight").toInt();
+        if (width > 0 && height > 0)
+        {
+            // 获取图像数据
+            QByteArray byteArray = query.value("image").toByteArray();
+            // 数据拷贝
+            unsigned char* pImageData = new unsigned char[width * height * 4];
+            memcpy(pImageData, byteArray.constData(), byteArray.size());
+
+            QImage image((uchar*)pImageData, width, height, QImage::Format_RGB32);
+            info.image = image;
+        }
+
+        infos.insert(info);
     }
 }
 
@@ -429,14 +448,26 @@ QString SQLCore::getCurrentIndexCountString(void)
 // 插入方案数据
 void SQLCore::insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info)
 {
-    QString insertString = QString("INSERT INTO %1 (schemeName, createTime, editTime, indexCount)"
-                           "VALUES(:schemeName, :createTime, :editTime, :indexCount)").arg(m_schemeTableName);
+    QString insertString = QString("INSERT INTO %1 (schemeName, createTime, editTime, indexCount, imageWidth, imageHeight, image)"
+                           "VALUES(:schemeName, :createTime, :editTime, :indexCount, :imageWidth, :imageHeight, :image)").arg(m_schemeTableName);
 
     m_pSqlQuery->prepare(insertString);
     m_pSqlQuery->bindValue(":schemeName", info.schemeName);
     m_pSqlQuery->bindValue(":createTime", info.createTime);
     m_pSqlQuery->bindValue(":editTime", info.editTime);
+    m_pSqlQuery->bindValue(":imageWidth", info.image.width());
+    m_pSqlQuery->bindValue(":imageHeight", info.image.height());
 
+
+    // 保存图片
+    QImage image = info.image;
+    if (info.image.format() != QImage::Format_RGB32)
+        image = info.image.convertToFormat(QImage::Format_RGB32);
+    QByteArray imageArray;
+    imageArray.append((const char*)image.constBits(), image.byteCount());
+    m_pSqlQuery->bindValue(":image", imageArray);
+
+    // 保存索引列表
     QString indexCountStr = getCurrentIndexCountString();
     m_pSqlQuery->bindValue(":indexCount", indexCountStr);
 
@@ -449,18 +480,230 @@ void SQLCore::insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info)
 // 编辑方案数据
 void SQLCore::editSchemeInfo(const QString& schemeName, const SchemeDataInfo::SchemeInfo& info)
 {
-    QString updateString("UPDATE %1 SET schemeName=\'%2\', createTime=%3, editTime=%4, indexCount=%5 WHERE schemeName=\'%6\';");
+    QString updateString("UPDATE %1 SET schemeName=':schemeName', "
+                         "createTime=:createTime, "
+                         "editTime=:editTime, "
+                         "indexCount=:indexCount, "
+                         "imageWidth=:imageWidth, "
+                         "imageHeight=:imageHeight, "
+                         "image=:image "
+                         "WHERE schemeName=\'%6\';");
+    updateString = updateString.arg(m_schemeTableName).arg(schemeName);
+    m_pSqlQuery->prepare(updateString);
 
-    //updateString = updateString.arg();
+    m_pSqlQuery->bindValue(":createTime", info.createTime);
+    m_pSqlQuery->bindValue(":editTime", info.editTime);
+    m_pSqlQuery->bindValue(":indexCount", getCurrentIndexCountString());
+    m_pSqlQuery->bindValue(":imageWidth", info.image.width());
+    m_pSqlQuery->bindValue(":imageHeight", info.image.height());
+
+    // 保存图片
+    QImage image = info.image;
+    if (info.image.format() != QImage::Format_RGB32)
+        image = info.image.convertToFormat(QImage::Format_RGB32);
+    QByteArray imageArray;
+    imageArray.append((const char*)image.constBits(), image.byteCount());
+    m_pSqlQuery->bindValue(":image", imageArray);
+
+    bool result = m_pSqlQuery->exec(updateString);
+    if (!result)
+        qDebug() << m_pSqlQuery->lastError().text();
 }
 
 // 删除方案数据
 void SQLCore::deleteSchemeInfo(const QString& schemeName)
+{
+    // 删除管理表中的记录
+    QString deleteString("DELETE FROM %1 WHERE schemeName=\'%2\'");
+    deleteString = deleteString.arg(m_schemeTableName).arg(schemeName);
+
+    bool result = m_pSqlQuery->exec(deleteString);
+    if (!result)
+        qDebug() << m_pSqlQuery->lastError().text();
+
+    // 删除属性表
+    QString deleteAttrString("DROP TABLE %1;");
+
+    // 删除主表
+    QString delString = deleteAttrString.arg(schemeName);
+    result = m_pSqlQuery->exec(delString);
+    if (!result)
+        qDebug() << m_pSqlQuery->lastError().text();
+
+    // 删除基础属性表
+    QString delString2 = deleteAttrString.arg(schemeName + m_baseAttrAppendString);
+    result = m_pSqlQuery->exec(delString2);
+    if (!result)
+        qDebug() << m_pSqlQuery->lastError().text();
+
+    // 删除扩展属性表
+    for (int i=(int)UICanvasItemManager::t_CanvasItem; i<UICanvasItemManager::t_End; ++i)
+    {
+        UICanvasItemManager::CanvasItemType itemType = (UICanvasItemManager::CanvasItemType)i;
+        QString tableName = schemeName + "_" + g_currentCanvasManager->getNodeTypeDisplayName(itemType);
+
+        QString delString3 = deleteAttrString.arg(tableName);
+        result = m_pSqlQuery->exec(delString3);
+        if (!result)
+            qDebug() << m_pSqlQuery->lastError().text();
+    }
+}
+
+void SQLCore::changedSchemeName(const QString& schemeName, const QString& destName)
 {
 
 }
 
 void SQLCore::loadScheme(const QString& schemeName)
 {
+    // 获取数目
+    int nTotalCount = 0;
+    QString countString = QString("SELECT COUNT(*) FROM %1;").arg(schemeName);
+    QSqlQuery query(countString);
+    while (query.next()) {
+        nTotalCount = query.value(0).toInt();
+    }
 
+    // 获取主表中所有节点
+    QString schemeMainString = QString("SELECT nodeName, nodeType, baseAttrIndex, extendAttrIndex FROM %1;").arg(schemeName);
+    QSqlQuery mainQuery(schemeMainString);
+    while (mainQuery.next()) {
+
+        // 获取节点名等信息
+        QString nodeName = mainQuery.value("nodeName").toString();
+        UICanvasItemManager::CanvasItemType nodeType = (UICanvasItemManager::CanvasItemType)mainQuery.value("nodeType").toInt();
+        int baseAttrIndex = mainQuery.value("baseAttrIndex").toInt();
+        int extendAttrIndex = mainQuery.value("extendAttrIndex").toInt();
+
+        // 创建CanvasItem
+        auto canvasItem = g_currentCanvasManager->createCanvasItem(nodeType, nodeName);
+        if (canvasItem == nullptr)
+            continue;
+
+        NDNodeBase* pNode = canvasItem->getCurrentNode();
+
+        // 设置扩展属性
+        setExtendAttr(schemeName, pNode, (int)nodeType, extendAttrIndex);
+
+        // 设置基本属性
+        setBaseAttr(schemeName, pNode, baseAttrIndex);
+    }
+}
+
+// 设置基本属性
+void SQLCore::setBaseAttr(const QString& schemeName, NDNodeBase* pNode, int index)
+{
+    QString baseAttrString("SELECT xPt, yPt, zPt, width, height, rotate FROM %1 WHERE id = %2");
+    baseAttrString = baseAttrString.arg(schemeName + m_baseAttrAppendString).arg(index);
+
+    QStringList queryKeyStrings;
+    queryKeyStrings << "xPt" << "yPt" << "zPt" << "width" << "height" << "rotate";
+    QSqlQuery query(baseAttrString);
+    while (query.next())
+    {
+        foreach (const QString& key, queryKeyStrings)
+        {
+            NDAttributeBase* pAttr = pNode->getAttribute(key);
+            if (pAttr == nullptr)
+                continue;
+            NDAttributeBase::setCurrentValue(pAttr, query.value(key));
+        }
+    }
+}
+
+// 颜色字符串转颜色
+QColor SQLCore::string2Color(const QString& colorString)
+{
+    QStringList strs = colorString.split(",");
+    if (strs.size() < 3)
+        return QColor();
+
+    int red = strs.at(0).toInt();
+    int green = strs.at(1).toInt();
+    int blue = strs.at(2).toInt();
+
+    QColor color;
+    color.setRed(red);
+    color.setGreen(green);
+    color.setBlue(blue);
+
+    return color;
+}
+
+// 设置扩展属性
+void SQLCore::setExtendAttr(const QString& schemeName, NDNodeBase* pNode, int canvasType, int index)
+{
+    UICanvasItemManager::CanvasItemType itemType = ( UICanvasItemManager::CanvasItemType)canvasType;
+    QStringList keyStrings;
+
+    switch (itemType)
+    {
+    case UICanvasItemManager::t_CanvasItem:
+    {
+        keyStrings << "width" << "height" << "canvasColor";
+        break;
+    }
+    case UICanvasItemManager::t_RectItem:
+    {
+        keyStrings << "bRounded" << "bFillColor" << "fillColor" << "bOutline" << "outlineWidth" << "outlineColor";
+        break;
+    }
+    case UICanvasItemManager::t_TextItem:
+    {
+        keyStrings << "text" << "fontSize" << "penSize" << "textColor"
+                   << "bFillColorOutline" << "fillColor" << "bShowOutline"
+                   << "outlineColor" << "outlineWidth";
+        break;
+    }
+    case UICanvasItemManager::t_EllipseItem:
+    {
+        keyStrings << "bRounded" << "bFillColor" << "fillColor" << "bOutline"
+                   << "outlineWidth" << "outlineColor";
+        break;
+    }
+    case UICanvasItemManager::t_ImageItem:
+    {
+        keyStrings << "imagePath";
+        break;
+    }
+    case UICanvasItemManager::t_PathItem:
+    {
+        keyStrings << "outlineWidth" << "outlineColor";
+        break;
+    }
+    case UICanvasItemManager::t_AudioItem:
+    {
+        keyStrings << "path" << "startColor" << "endColor";
+        break;
+    }
+    default:
+        return;
+    }
+
+    if (keyStrings.size() <= 0)
+        return;
+
+    QString queryString = "SELECT %1 FROM %2 WHERE id = %3";
+    queryString = queryString
+            .arg(keyStrings.join(","))
+            .arg(schemeName + "_" + g_currentCanvasManager->getNodeTypeDisplayName(itemType))
+            .arg(index);
+
+    // 查找
+    QSqlQuery query(queryString);
+    while (query.next()){
+        foreach (const QString& key, keyStrings)
+        {
+            NDAttributeBase* pAttr = pNode->getAttribute(key);
+            if (pAttr == nullptr)
+                continue;
+
+            QVariant value = query.value(key);
+            if (pAttr->Type() == NDAttributeBase::t_color)
+            {
+                value.setValue<QColor>(string2Color(value.toString()));
+            }
+            NDAttributeBase::setCurrentValue(pAttr, value);
+        }
+    }
 }

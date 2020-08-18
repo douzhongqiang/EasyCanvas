@@ -15,6 +15,7 @@
 #include "NDIntAttribute.h"
 #include "RALLBlockSignal.h"
 #include "UICanvasItemManager.h"
+#include "UICanvasView.h"
 
 QImage UICanvasItemBase::m_closeIcon;
 QImage UICanvasItemBase::m_resizeIcon;
@@ -32,6 +33,11 @@ UICanvasItemBase::UICanvasItemBase(QGraphicsItem* parentItem)
 
     // 初始化基本属性
     initNodeBase();
+
+    // 获取中心位置
+    m_size = QSize(100, 100);
+    QPointF centerPos = g_currentCanvasManager->getCurrentCanvasView()->getCenterPos();
+    this->setPos(centerPos);
 }
 
 UICanvasItemBase::~UICanvasItemBase()
@@ -47,6 +53,22 @@ void UICanvasItemBase::setItemResizeable(bool resizeable)
 NDNodeBase* UICanvasItemBase::getCurrentNode(void) const
 {
     return m_pNode;
+}
+
+// 拷贝另一元素到自身数据中
+void UICanvasItemBase::copyFromItem(UICanvasItemBase* pItem)
+{
+    if (pItem == nullptr || pItem->m_pNode->getNodeType() != m_pNode->getNodeType())
+        return;
+
+    m_pXPostionAttribute->setCurrentValue(pItem->m_pXPostionAttribute->getCurrentValue());
+    m_pYPostionAttribute->setCurrentValue(pItem->m_pYPostionAttribute->getCurrentValue());
+    m_pZPostionAttribute->setCurrentValue(pItem->m_pZPostionAttribute->getCurrentValue());
+
+    m_pWidthAttribute->setCurrentValue(pItem->m_pWidthAttribute->getCurrentValue());
+    m_pHeightAttribute->setCurrentValue(pItem->m_pHeightAttribute->getCurrentValue());
+
+    m_pRotateAttribute->setCurrentValue(pItem->m_pRotateAttribute->getCurrentValue());
 }
 
 void UICanvasItemBase::setItemResizeRatio(bool resizeRation, qreal rationValue)
@@ -342,6 +364,7 @@ void UICanvasItemBase::initNodeBase(void)
     m_pRotateAttribute->setDisplayName(tr("Rotate Angle: "));
     m_pRotateAttribute->setName("rotate");
     m_pRotateAttribute->setValueRange(0, 360);
+    m_pRotateAttribute->setCurrentValue(0);
     m_pNode->addAttribute(pGroup, m_pRotateAttribute);
 
     // 连接信号和槽

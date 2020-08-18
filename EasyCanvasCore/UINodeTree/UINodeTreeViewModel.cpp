@@ -10,6 +10,7 @@ UINodeTreeViewModel::UINodeTreeViewModel(QObject* parent)
 
     QObject::connect(m_pCanvasItemData, &UICanvasItemManager::addedNode, this, &UINodeTreeViewModel::onAddedNodeItem);
     QObject::connect(m_pCanvasItemData, &UICanvasItemManager::deletedNode, this, &UINodeTreeViewModel::onDeleteNodeItem);
+    QObject::connect(m_pCanvasItemData, &UICanvasItemManager::changeNodeName, this, &UINodeTreeViewModel::onChangeNodeItemName);
 }
 
 UINodeTreeViewModel::~UINodeTreeViewModel()
@@ -170,8 +171,9 @@ bool UINodeTreeViewModel::setData(const QModelIndex &index, const QVariant &valu
 
     UINodeItem* pNode = static_cast<UINodeItem*>(index.internalPointer());
     QString nodeName = pNode->getName();
-    if (m_pCanvasItemData->changedNodeName(nodeName, value.toString()))
+    if (m_pCanvasItemData->isCanChangedName(nodeName, value.toString()))
     {
+        m_pCanvasItemData->changedNodeNameCmd(nodeName, value.toString());
         pNode->setName(value.toString());
         return true;
     }
@@ -207,5 +209,23 @@ void UINodeTreeViewModel::onDeleteNodeItem(int nodeType, const QString& name)
 
     // 更新显示
     m_pTreeView->clearSelection();
+    m_pTreeView->doItemsLayout();
+}
+
+void UINodeTreeViewModel::onChangeNodeItemName(int nodeType, const QString& srcName, const QString& destName)
+{
+    UINodeItem* node = m_pRootNodeItem->getChildNode(nodeType - 2);
+    if (node == nullptr)
+        return;
+
+    // 删除节点
+    UINodeItem* childNodeItem = node->getChildNode(srcName);
+    if (childNodeItem == nullptr)
+        return;
+
+    childNodeItem->setName(destName);
+
+    // 更新显示
+    //m_pTreeView->clearSelection();
     m_pTreeView->doItemsLayout();
 }

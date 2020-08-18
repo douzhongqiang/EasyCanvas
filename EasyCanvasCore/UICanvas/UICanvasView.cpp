@@ -44,63 +44,27 @@ UICanvasView::~UICanvasView()
 
 void UICanvasView::createImageItem(void)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_ImageItem);
-    UICanvasImageItem* imageItem = dynamic_cast<UICanvasImageItem*>(item);
-    m_pScene->addItem(imageItem);
-    imageItem->setPos(getCenterPos());
-    imageItem->setImage("./t3.jpg");
-
-    cleanAllSelected();
-    imageItem->setSelected(true);
+    g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_ImageItem);
 }
 
 void UICanvasView::createTextItem(void)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_TextItem);
-    UICanvasTextItem* textItem = dynamic_cast<UICanvasTextItem*>(item);
-    m_pScene->addItem(textItem);
-    textItem->setCurrentText(tr("Easy Canvas"));
-    textItem->setPos(getCenterPos());
-
-    cleanAllSelected();
-    textItem->setSelected(true);
+    g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_TextItem);
 }
 
 void UICanvasView::createRectItem(void)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_RectItem);
-    UICanvasRectItem* rectItem = dynamic_cast<UICanvasRectItem*>(item);
-    m_pScene->addItem(rectItem);
-    rectItem->setSize(100, 100);
-    rectItem->setPos(getCenterPos());
-
-    cleanAllSelected();
-    rectItem->setSelected(true);
+    g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_RectItem);
 }
 
 void UICanvasView::createEllipseItem(void)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_EllipseItem);
-    UICanvasEllipseItem* ellipseItem = dynamic_cast<UICanvasEllipseItem*>(item);
-    m_pScene->addItem(ellipseItem);
-    ellipseItem->setSize(100, 100);
-    ellipseItem->setPos(getCenterPos());
-
-    cleanAllSelected();
-    ellipseItem->setSelected(true);
+    g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_EllipseItem);
 }
 
 void UICanvasView::createAudioItem(void)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_AudioItem);
-    UICanvasAudioItem* audioItem = dynamic_cast<UICanvasAudioItem*>(item);
-    m_pScene->addItem(audioItem);
-
-    audioItem->setPos(getCenterPos());
-    audioItem->setCurrentSize(QSize(300, 60));
-
-    cleanAllSelected();
-    audioItem->setSelected(true);
+    g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_AudioItem);
 }
 
 // 设置选中矩形
@@ -247,6 +211,35 @@ void UICanvasView::saveToImage(const QString& imagePath)
     cleanAllSelected();
     m_pScene->render(&painter);
     image.save(imagePath);
+}
+
+// 添加到场景中
+void UICanvasView::addToScene(UICanvasItemBase* item)
+{
+    m_pScene->addItem(item);
+}
+
+// 从场景中删除
+void UICanvasView::removeFromScene(UICanvasItemBase* item)
+{
+    m_pScene->removeItem(item);
+}
+
+void UICanvasView::saveToImage(QImage& saveImage)
+{
+    int width = m_pScene->width();
+    int height = m_pScene->height();
+
+    QImage image(QSize(width, height), QImage::Format_RGB32);
+
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    cleanAllSelected();
+    m_pScene->render(&painter);
+    saveImage = image;
 }
 
 void UICanvasView::cleanAllSelected(void)

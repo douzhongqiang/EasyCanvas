@@ -61,12 +61,14 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    UICore/GlobalHotKeyFilter.cpp \
         UICore/MainWindow.cpp \
     UICore/UIAboutMeDialog.cpp \
         UICore/UIAttributWidget.cpp \
 		main.cpp
 
 HEADERS += \
+        UICore/GlobalHotKeyFilter.h \
         UICore/MainWindow.h \
         UICore/UIAboutMeDialog.h \
         UICore/UIAttributWidget.h

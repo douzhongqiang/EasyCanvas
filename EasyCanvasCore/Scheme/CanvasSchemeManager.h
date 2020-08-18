@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QSet>
 #include "easycanvascore_global.h"
 #include "SchemeDataInfo.h"
 
@@ -23,7 +24,20 @@ public:
     // 保存当前方案
     void saveScheme(void);
 
-    const QList<SchemeDataInfo::SchemeInfo>& getSchemeInfoList(void);
+    // 删除方案
+    void deleteScheme(const QString& schemeName);
+
+    // 打开方案
+    void openScheme(void);
+
+    // 修改方案名称
+    void changedSchemeName(const QString& name, const QString& destName);
+
+    // 获取全部数据
+    QSet<SchemeDataInfo::SchemeInfo> getSchemeInfoList(void);
+    // 获取方案名
+    QString getSchemeName(int index);
+    SchemeDataInfo::SchemeInfo getSchemeInfo(int index);
 
 private:
     CanvasSchemeManager();
@@ -38,9 +52,13 @@ private:
     QString m_schemeName;
 
     // 方案管理数据信息
-    QList<SchemeDataInfo::SchemeInfo> m_schemeInfos;
+    QSet<SchemeDataInfo::SchemeInfo> m_schemeInfos;
     // 从数据库同步方案
     void syncSchemeInfoFromDB(void);
+    // 将图片转化为缩略图
+    QImage converToSamllImage(const QImage& image);
+    int m_nMaxWidth = 300;
+    int m_nMaxHeight = 300;
 };
 
 #endif

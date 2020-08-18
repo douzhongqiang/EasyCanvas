@@ -44,6 +44,8 @@ INCLUDEPATH += $$PWD/../thirdLibs/ffmpeg/include
 SOURCES += \
         Scheme/CanvasSchemeManager.cpp \
         Scheme/SQLCore.cpp \
+        Scheme/UISchemeManagerDialog.cpp \
+        Scheme/UISchemeManagerWidget.cpp \
         UICanvas/UICanvasArrows.cpp \
         UICanvas/UICanvasAudioItem.cpp \
         UICanvas/UICanvasEllipseItem.cpp \
@@ -61,13 +63,17 @@ SOURCES += \
         UINodeTree/UINodeTreeView.cpp \
         UINodeTree/UINodeTreeViewModel.cpp \
         UndoCmd/ItemAttributeChangedCmd.cpp \
+        UndoCmd/ItemChangeNameCmd.cpp \
         UndoCmd/ItemCreateCmd.cpp \
+        UndoCmd/ItemDeleteCmd.cpp \
         UndoCmd/UndoCmdCore.cpp
 
 HEADERS += \
         Scheme/CanvasSchemeManager.h \
         Scheme/SQLCore.h \
         Scheme/SchemeDataInfo.h \
+        Scheme/UISchemeManagerDialog.h \
+        Scheme/UISchemeManagerWidget.h \
         UICanvas/UICanvasArrows.h \
         UICanvas/UICanvasAudioItem.h \
         UICanvas/UICanvasEllipseItem.h \
@@ -85,7 +91,9 @@ HEADERS += \
         UINodeTree/UINodeTreeView.h \
         UINodeTree/UINodeTreeViewModel.h \
         UndoCmd/ItemAttributeChangedCmd.h \
+        UndoCmd/ItemChangeNameCmd.h \
         UndoCmd/ItemCreateCmd.h \
+        UndoCmd/ItemDeleteCmd.h \
         UndoCmd/UndoCmdCore.h \
         easycanvascore_global.h 
 

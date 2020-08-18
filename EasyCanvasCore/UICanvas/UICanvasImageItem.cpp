@@ -9,6 +9,7 @@ UICanvasImageItem::UICanvasImageItem(QGraphicsItem* parentItem)
     :UICanvasItemBase(parentItem)
 {
     initAttribute();
+    setImage("./t3.jpg");
 }
 
 UICanvasImageItem::~UICanvasImageItem()

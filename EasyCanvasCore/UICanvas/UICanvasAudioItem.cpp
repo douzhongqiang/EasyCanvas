@@ -16,6 +16,7 @@ UICanvasAudioItem::UICanvasAudioItem(QGraphicsItem* parentItem)
     ,m_cStartColor(150, 255, 200)
     ,m_cEndColor(46, 216, 130)
 {
+    setCurrentSize(QSize(300, 60));
     initAttributes();
 
     m_pAudioPlayer = new AudioPlayer(this);

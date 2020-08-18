@@ -6,11 +6,13 @@
 #include <QList>
 #include <QHash>
 #include <QIcon>
+#include <QSharedPointer>
 #include "easycanvascore_global.h"
 
 class NDNodeBase;
 class UICanvasItemBase;
 class UICanvasView;
+class UndoCmdCore;
 
 #define g_currentCanvasManager UICanvasItemManager::getCurrentCanvasManager()
 
@@ -45,17 +47,24 @@ public:
     ~UICanvasItemManager();
 
     // 创建节点
-    UICanvasItemBase* createCanvasItem(CanvasItemType type);
+    QSharedPointer<UICanvasItemBase> createCanvasItemByCmd(CanvasItemType type);
+    QSharedPointer<UICanvasItemBase> createCanvasItem(CanvasItemType type, const QString& nodeName = "", bool isAdded = true);
+    // 添加节点
+    void addCanvasItem(QSharedPointer<UICanvasItemBase> pCanvasItem);
     // 删除节点
+    void deleteCanvasItemByCmd(const QStringList& nodeName);
     void deleteCanvasItem(NDNodeBase* node);
     void deleteCanvasItem(const QString& nodeName);
     void deleteCanvasItems(const QStringList& nodeNames);
     // 替换节点名称
+    bool isCanChangedName(const QString& srcName, const QString& destName);
+    void changedNodeNameCmd(const QString& srcName, const QString& destName);
     bool changedNodeName(const QString& srcName, const QString& destName);
     // 获取所有节点名称
     QStringList getAllNodeNames(void);
     // 查找节点
     NDNodeBase* getNode(const QString& name);
+    QSharedPointer<UICanvasItemBase> getCanvasItem(const QString& name);
     // 清除所有
     void cleanAll(void);
     // 设置当前的选择列表
@@ -82,8 +91,13 @@ public:
     static void setCurrentIndex(int index);
     static int getCurrentIndex(void);
 
+public:
+    // 撤銷和重做相关
+    void redo(void);
+    void undo(void);
+
 private:
-    QHash<QString, UICanvasItemBase*> m_nameHash;
+    QHash<QString, QSharedPointer<UICanvasItemBase>> m_nameHash;
     QMap<CanvasItemType, TypeNodeInfo> m_countMap;
 
     // 类型转化为字符串名字
@@ -97,10 +111,14 @@ private:
 
     // 当前的CanvasView
     UICanvasView* m_pCanvasView = nullptr;
+    // UodoCmdCore
+    UndoCmdCore* m_pUndoCmdCore = nullptr;
+    QSharedPointer<UICanvasItemBase> m_pCanvasItemBase;
 
 signals:
     void addedNode(int type, const QString& nodeName);
     void deletedNode(int type, const QString& nodeName);
+    void changeNodeName(int type, const QString& srcName, const QString& destName);
 };
 
 #endif

@@ -3,6 +3,9 @@
 #include "UICanvasPathItem.h"
 #include "UICanvas/UICanvasItemManager.h"
 #include "UICanvasItemBase.h"
+#include "NDNodeBase.h"
+#include "NDAttributeBase.h"
+#include "NDRealAttribute.h"
 #include <QMouseEvent>
 
 UICanvasOperBase::UICanvasOperBase(UICanvasView* view)
@@ -104,6 +107,7 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Delete)
     {
+        QStringList selectedNodeNames;
         // 删除选中的元素
         auto selectedItems = m_pCanvasView->scene()->selectedItems();
         for (auto item : selectedItems)
@@ -112,10 +116,70 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
             if (canvasItem == nullptr)
                 continue;
 
-            // 刪除
-            NDNodeBase* node = canvasItem->getCurrentNode();
-            g_currentCanvasManager->deleteCanvasItem(node);
+            selectedNodeNames << canvasItem->getCurrentNode()->getNodeName();
         }
+
+        // 执行删除命令
+        if (selectedNodeNames.size() > 0)
+            g_currentCanvasManager->deleteCanvasItemByCmd(selectedNodeNames);
+    }
+    else if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down)
+    {
+        // 方向键 上和下 微调
+        auto selectedItems = m_pCanvasView->scene()->selectedItems();
+        for (auto item : selectedItems)
+        {
+            UICanvasItemBase* canvasItem = dynamic_cast<UICanvasItemBase*>(item);
+            if (canvasItem == nullptr)
+                continue;
+
+            NDAttributeBase* pAttr = canvasItem->getCurrentNode()->getAttribute("yPt");
+            NDRealAttribute* pYPtAttr = qobject_cast<NDRealAttribute*>(pAttr);
+            if (pYPtAttr == nullptr)
+                continue;
+
+            // 重新设置属性
+            qreal yPt = pYPtAttr->getCurrentValue();
+            if (event->key() == Qt::Key_Up)
+                yPt -= 2;
+            else
+                yPt += 2;
+            pYPtAttr->setCurrentValue(yPt);
+        }
+    }
+    else if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)
+    {
+        // 方向键 左和右 微调
+        auto selectedItems = m_pCanvasView->scene()->selectedItems();
+        for (auto item : selectedItems)
+        {
+            UICanvasItemBase* canvasItem = dynamic_cast<UICanvasItemBase*>(item);
+            if (canvasItem == nullptr)
+                continue;
+
+            NDAttributeBase* pAttr = canvasItem->getCurrentNode()->getAttribute("xPt");
+            NDRealAttribute* pXPtAttr = qobject_cast<NDRealAttribute*>(pAttr);
+            if (pXPtAttr == nullptr)
+                continue;
+
+            // 重新设置属性
+            qreal xPt = pXPtAttr->getCurrentValue();
+            if (event->key() == Qt::Key_Left)
+                xPt -= 2;
+            else
+                xPt += 2;
+            pXPtAttr->setCurrentValue(xPt);
+        }
+    }
+    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_Z)
+    {
+        // Ctrl+Z 撤销
+        g_currentCanvasManager->undo();
+    }
+    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_Y)
+    {
+        // Ctrl+Y 重做
+        g_currentCanvasManager->redo();
     }
 
     return false;
@@ -126,8 +190,8 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
 UICanvasPenOper::UICanvasPenOper(UICanvasView* view)
     :UICanvasOperBase(view)
 {
-    UICanvasItemBase* item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_PathItem);
-    m_pPathItem = dynamic_cast<UICanvasPathItem*>(item);
+    auto item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_PathItem);
+    m_pPathItem = dynamic_cast<UICanvasPathItem*>(item.data());
     view->scene()->addItem(m_pPathItem);
 }
 

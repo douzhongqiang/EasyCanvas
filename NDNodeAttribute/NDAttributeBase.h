@@ -29,7 +29,9 @@ public:
     virtual AttributeType Type(void) const = 0 ;
 
     static NDAttributeBase* createAttribute(const QString& name, AttributeType type, const QString& displayName = "");
+    // 设置/获取属性
     static QVariant getCurrentValue(NDAttributeBase* pAttribute);
+    static void setCurrentValue(NDAttributeBase* pAttribute, const QVariant value);
 
     // 设置名字
     void setName(const QString& name);

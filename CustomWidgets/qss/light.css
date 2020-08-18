@@ -558,7 +558,7 @@ QTableView
     outline: none;
 }
 
-QTreeView, QListView, QListWidget
+QTreeView
 {
     show-decoration-selected: 1;
     background-color: rgb(80, 80, 80);
@@ -567,11 +567,29 @@ QTreeView, QListView, QListWidget
     border-radius: 4px;
 }
 
-QTreeView::item, QListView::item, QListWidget::item, QTableView::item
+QListView, QListWidget
+{
+    show-decoration-selected: 1;
+    background-color: rgb(60, 60, 60);
+    color: rgb(255, 255, 255);
+    outline: none;
+    border-radius: 4px;
+}
+
+QTreeView::item, QTableView::item
 {
     background: rgb(80, 80, 80);
     color: rgb(255, 255, 255);
     outline: none;
+}
+
+QListView::item, QListWidget::item
+{
+    background: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    outline: none;
+    border: 1px solid rgb(253, 135, 50);
+    border-radius: 4px;
 }
 
 QTreeView::item:hover, QListView::item:hover, QListWidget::item:hover, QTableView::item:hover

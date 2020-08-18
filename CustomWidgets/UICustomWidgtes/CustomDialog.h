@@ -71,6 +71,7 @@ protected:
 
     void paintEvent(QPaintEvent* event) override;
     bool nativeEvent(const QByteArray & eventType, void * message, long * result) override;
+    void showEvent(QShowEvent* event) override;
 
 private:
     static const int m_nBorderWidth;
@@ -85,6 +86,8 @@ private:
     QMargins m_frames;
     bool m_bJustMaximized = false;
     bool m_bResizeable = true;
+
+    bool m_isShowed = false;
 
 private slots:
     void onClickedMaximizeButton(void);

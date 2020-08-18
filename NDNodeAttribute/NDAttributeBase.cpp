@@ -154,3 +154,44 @@ QVariant NDAttributeBase::getCurrentValue(NDAttributeBase* pAttribute)
 
     return QVariant();
 }
+
+void NDAttributeBase::setCurrentValue(NDAttributeBase* pAttribute, const QVariant value)
+{
+    AttributeType attrType = pAttribute->Type();
+
+    switch (attrType)
+    {
+    case t_bool:
+    {
+        NDBoolAttribute* pValueAttr = dynamic_cast<NDBoolAttribute*>(pAttribute);
+        pValueAttr->setCurrentValue(value.toBool());
+        break;
+    }
+    case t_int:
+    {
+        NDIntAttribute* pValueAttr = dynamic_cast<NDIntAttribute*>(pAttribute);
+        pValueAttr->setCurrentValue(value.toInt());
+        break;
+    }
+    case t_qreal:
+    {
+        NDRealAttribute* pValueAttr = dynamic_cast<NDRealAttribute*>(pAttribute);
+        pValueAttr->setCurrentValue(value.toDouble());
+        break;
+    }
+    case t_string:
+    {
+        NDStringAttribute* pValueAttr = dynamic_cast<NDStringAttribute*>(pAttribute);
+        pValueAttr->setCurrentValue(value.toString());
+        break;
+    }
+    case t_color:
+    {
+        NDColorAttribute* pValueAttr = dynamic_cast<NDColorAttribute*>(pAttribute);
+        pValueAttr->setCurrentValue(value.value<QColor>());
+        break;
+    }
+    default:
+        break;
+    }
+}

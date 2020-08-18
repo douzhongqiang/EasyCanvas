@@ -76,9 +76,11 @@ const int CustomDialog::m_nBorderWidth = 10;
 CustomDialog::CustomDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+    Qt::WindowFlags windowFlags = this->windowFlags() | Qt::Window | Qt::FramelessWindowHint;
+    windowFlags &= ~Qt::WindowSystemMenuHint;
 
-    setResizeable(true);
+    setWindowFlags(windowFlags);
+
     // init UI
     initUi();
 }
@@ -117,7 +119,7 @@ void CustomDialog::setResizeable(bool resizeable)
     //
     //we better left 1 piexl width of border untouch, so OS can draw nice shadow around it
     const MARGINS shadow = { 1, 1, 1, 1 };
-    //::DwmExtendFrameIntoClientArea(HWND(winId()), &shadow);
+    ::DwmExtendFrameIntoClientArea(HWND(winId()), &shadow);
 
     setVisible(visible);
 }
@@ -289,6 +291,8 @@ bool CustomDialog::nativeEvent(const QByteArray &eventType, void *message, long 
 
         long x = GET_X_LPARAM(param->lParam);
         long y = GET_Y_LPARAM(param->lParam);
+        int nX = x - this->geometry().x();
+        int nY = y - this->geometry().y();
 
         //support highdpi
         double dpr = this->devicePixelRatioF();
@@ -298,76 +302,41 @@ bool CustomDialog::nativeEvent(const QByteArray &eventType, void *message, long 
             return true;
         }
 
-        if(m_bResizeable)
-        {
+        QRect nRect = this->rect().adjusted(m_nBorderWidth, m_nBorderWidth, -m_nBorderWidth, -m_nBorderWidth);
+        bool needDispose = this->rect().contains(nX, nY) && !nRect.contains(nX, nY);
+        if (!needDispose)
+            return QDialog::nativeEvent(eventType, message, result);
 
-            bool resizeWidth = minimumWidth() != maximumWidth();
-            bool resizeHeight = minimumHeight() != maximumHeight();
+        // dispose window frame
+        if ((nX > 0) && (nX < m_nBorderWidth))
+            *result = HTLEFT;
 
-            if(resizeWidth)
-            {
-                //left border
-                if (x >= winrect.left && x < winrect.left + border_width)
-                {
-                    *result = HTLEFT;
-                    return true;
-                }
-                //right border
-                if (x < winrect.right && x >= winrect.right - border_width)
-                {
-                    *result = HTRIGHT;
-                    return true;
-                }
-            }
-            if(resizeHeight)
-            {
-                //bottom border
-                if (y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOM;
-                    return true;
-                }
-                //top border
-                if (y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOP;
-                    return true;
-                }
-            }
-            if(resizeWidth && resizeHeight)
-            {
-                //bottom left corner
-                if (x >= winrect.left && x < winrect.left + border_width &&
-                        y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOMLEFT;
-                    return true;
-                }
-                //bottom right corner
-                if (x < winrect.right && x >= winrect.right - border_width &&
-                        y < winrect.bottom && y >= winrect.bottom - border_width)
-                {
-                    *result = HTBOTTOMRIGHT;
-                    return true;
-                }
-                //top left corner
-                if (x >= winrect.left && x < winrect.left + border_width &&
-                        y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOPLEFT;
-                    return true;
-                }
-                //top right corner
-                if (x < winrect.right && x >= winrect.right - border_width &&
-                        y >= winrect.top && y < winrect.top + border_width)
-                {
-                    *result = HTTOPRIGHT;
-                    return true;
-                }
-            }
-        }
+        if ((nX > this->width() - m_nBorderWidth) && (nX < this->width()))
+            *result = HTRIGHT;
 
-        return QDialog::nativeEvent(eventType, message, result);
+        if ((nY > 0) && (nY < m_nBorderWidth))
+            *result = HTTOP;
+
+        if ((nY > this->height() - m_nBorderWidth) && (nY < this->height()))
+            *result = HTBOTTOM;
+
+        if ((nX > 0) && (nX < m_nBorderWidth) && (nY > 0)
+            && (nY < m_nBorderWidth))
+            *result = HTTOPLEFT;
+
+        if ((nX > this->width() - m_nBorderWidth) && (nX < this->width())
+            && (nY > 0) && (nY < m_nBorderWidth))
+            *result = HTTOPRIGHT;
+
+        if ((nX > 0) && (nX < m_nBorderWidth)
+            && (nY > this->height() - m_nBorderWidth) && (nY < this->height()))
+            *result = HTBOTTOMLEFT;
+
+        if ((nX > this->width() - m_nBorderWidth) && (nX < this->width())
+            && (nY > this->height() - m_nBorderWidth) && (nY < this->height()))
+            *result = HTBOTTOMRIGHT;
+
+        return true;
     }
     case WM_GETMINMAXINFO:
     {
@@ -410,5 +379,16 @@ bool CustomDialog::nativeEvent(const QByteArray &eventType, void *message, long 
     }
 
     return QDialog::nativeEvent(eventType, message, result);
+}
+
+void CustomDialog::showEvent(QShowEvent* event)
+{
+    if (!m_isShowed)
+    {
+        m_isShowed = true;
+        setResizeable(m_bResizeable);
+    }
+
+    QDialog::showEvent(event);
 }
 

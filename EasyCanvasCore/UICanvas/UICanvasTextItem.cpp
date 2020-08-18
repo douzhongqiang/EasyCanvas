@@ -15,6 +15,8 @@ UICanvasTextItem::UICanvasTextItem(QGraphicsItem* parentItem)
 
     this->setItemResizeable(false);
     initAttribute();
+
+    setCurrentText("EasyCanvas");
 }
 
 UICanvasTextItem::~UICanvasTextItem()
@@ -118,7 +120,7 @@ void UICanvasTextItem::initAttribute(void)
 
     // 是否填充颜色
     m_pBFillColorAttribute = new NDBoolAttribute;
-    m_pBFillColorAttribute->setCurrentValue(false);
+    m_pBFillColorAttribute->setCurrentValue(true);
     m_pBFillColorAttribute->setDisplayName(tr("Is Fill Color: "));
     m_pBFillColorAttribute->setName("bFillColorOutline");
     m_pNode->addAttribute(groupName, m_pBFillColorAttribute);

@@ -9,6 +9,7 @@ class UICanvasOperBase;
 class UICanvasPathItem;
 class NDNodeBase;
 class UICanvasScene;
+class UICanvasItemBase;
 class EASYCANVASCORESHARED_EXPORT UICanvasView : public QGraphicsView
 {
     Q_OBJECT
@@ -53,8 +54,14 @@ public:
     // 获取中心点坐标
     QPointF getCenterPos(void);
 
+    // 添加到场景中
+    void addToScene(UICanvasItemBase* item);
+    // 从场景中删除
+    void removeFromScene(UICanvasItemBase* item);
+
     // 保存
     void saveToImage(const QString& imagePath);
+    void saveToImage(QImage& saveImage);
 
     // 清除所有选择
     void cleanAllSelected(void);

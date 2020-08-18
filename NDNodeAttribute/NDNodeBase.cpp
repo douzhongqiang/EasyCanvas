@@ -92,6 +92,21 @@ bool NDNodeBase::deleteAttribute(const QString& name)
     return false;
 }
 
+
+// 查找属性
+NDAttributeBase* NDNodeBase::getAttribute(const QString& attrName)
+{
+    foreach (auto item, m_groupList)
+    {
+        if (NDAttributeBase* attribute = item->getAttribute(attrName))
+        {
+            return attribute;
+        }
+    }
+
+    return nullptr;
+}
+
 // 设置节点名字
 void NDNodeBase::setNodeName(const QString& nodeName)
 {

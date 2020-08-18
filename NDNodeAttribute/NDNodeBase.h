@@ -54,6 +54,9 @@ public:
     bool deleteAttribute(NDAttributeBase* attribute);
     bool deleteAttribute(const QString& name);
 
+    // 查找属性
+    NDAttributeBase* getAttribute(const QString& attrName);
+
 private:
     QList<NDAttributeGroup*> m_groupList;
     int m_nodeType;

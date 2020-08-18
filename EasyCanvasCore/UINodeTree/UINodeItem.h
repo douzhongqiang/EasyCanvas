@@ -19,6 +19,7 @@ public:
     void removeChildNode(const QString& nodeName);
     // 获取子节点
     UINodeItem* getChildNode(int index);
+    UINodeItem* getChildNode(const QString& nodeName);
 
     // 设置/获取父节点
     void setParentNode(UINodeItem* node);

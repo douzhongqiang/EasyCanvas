@@ -111,7 +111,6 @@ void UICanvasRectItem::initAttribute()
     QObject::connect(m_pBOutLineAttribute, &NDBoolAttribute::valueChanged, this, &UICanvasRectItem::onValueChanged);
     QObject::connect(m_pOutLineWidthAttribute, &NDIntAttribute::valueChanged, this, &UICanvasRectItem::onValueChanged);
     QObject::connect(m_pOutLineColorAttribute, &NDColorAttribute::valueChanged, this, &UICanvasRectItem::onValueChanged);
-
 }
 
 void UICanvasRectItem::onValueChanged(void)
