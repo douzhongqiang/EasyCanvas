@@ -209,7 +209,9 @@ void SQLCore::insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info)
 
     bool result = m_pSqlQuery->exec();
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+    {
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
+    }
 
 }
 
@@ -244,7 +246,7 @@ void SQLCore::editSchemeInfo(const QString& schemeName, const SchemeDataInfo::Sc
 
     bool result = m_pSqlQuery->exec();
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 // 删除方案数据
@@ -265,7 +267,7 @@ void SQLCore::deleteSchemeInfo(const QString& schemeName)
     QString delString = deleteAttrString.arg(schemeName);
     result = m_pSqlQuery->exec(delString);
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 void SQLCore::changedSchemeName(const QString& schemeName, const QString& destName)
@@ -284,7 +286,7 @@ void SQLCore::changedSchemeName(const QString& schemeName, const QString& destNa
     reNameString = reNameString.arg(schemeName).arg(destName);
     result = m_pSqlQuery->exec(reNameString);
         if (!result)
-            qDebug() << m_pSqlQuery->lastError().text();
+            qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 void SQLCore::loadScheme(const QString& schemeName)

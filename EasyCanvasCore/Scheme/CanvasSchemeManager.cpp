@@ -47,7 +47,8 @@ void CanvasSchemeManager::saveScheme(void)
     // 查找是否存在方案
     SchemeDataInfo::SchemeInfo tempInfo;
     tempInfo.schemeName = m_schemeName;
-    auto iter = m_schemeInfos.find(tempInfo);
+
+    auto iter = std::find(m_schemeInfos.begin(), m_schemeInfos.end(), tempInfo);
 
     if (iter == m_schemeInfos.end())
     {

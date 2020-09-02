@@ -27,8 +27,16 @@ public:
             return editTime < info.editTime;
         }
     };
-
 };
+
+//class SchemeDataInfoSort
+//{
+//public:
+//    bool operator () (const SchemeDataInfo::SchemeInfo& a, const SchemeDataInfo::SchemeInfo& b) const
+//    {
+//        if ()
+//    }
+//};
 
 inline uint qHash(const SchemeDataInfo::SchemeInfo& schemeInfo, uint seed = 0)
 {
