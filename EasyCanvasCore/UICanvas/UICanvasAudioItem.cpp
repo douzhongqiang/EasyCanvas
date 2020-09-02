@@ -131,7 +131,7 @@ void UICanvasAudioItem::initAttributes(void)
 
     // 音频文件路径
     m_pFilePathAttribute = new NDStringAttribute;
-    m_pFilePathAttribute->setCurrentValue("Test Value");
+    m_pFilePathAttribute->setValue("Test Value");
     m_pFilePathAttribute->setDisplayName(tr("Audio File Path: "));
     m_pFilePathAttribute->setName("path");
     m_pFilePathAttribute->setShowButton(true);
@@ -143,13 +143,13 @@ void UICanvasAudioItem::initAttributes(void)
     // 颜色属性
     // 开始颜色
     m_pStartColorAttribute = new NDColorAttribute;
-    m_pStartColorAttribute->setCurrentValue(m_cStartColor);
+    m_pStartColorAttribute->setValue(m_cStartColor);
     m_pStartColorAttribute->setDisplayName(tr("Start Color: "));
     m_pStartColorAttribute->setName("startColor");
     m_pNode->addAttribute(otherAttrs, m_pStartColorAttribute);
     // 终止颜色
     m_pEndColorAttribute = new NDColorAttribute;
-    m_pEndColorAttribute->setCurrentValue(m_cEndColor);
+    m_pEndColorAttribute->setValue(m_cEndColor);
     m_pEndColorAttribute->setDisplayName(tr("End Color: "));
     m_pEndColorAttribute->setName("endColor");
     m_pNode->addAttribute(otherAttrs, m_pEndColorAttribute);
@@ -182,23 +182,23 @@ bool UICanvasAudioItem::isPlaying(void)
     return false;
 }
 
-void UICanvasAudioItem::onStartColorValueChanged(const QColor& color)
+void UICanvasAudioItem::onStartColorValueChanged(const QVariant& color)
 {
-    m_cStartColor = color;
+    m_cStartColor = color.value<QColor>();
     this->update();
 }
 
-void UICanvasAudioItem::onEndColorValueChanged(const QColor& color)
+void UICanvasAudioItem::onEndColorValueChanged(const QVariant& color)
 {
-    m_cEndColor = color;
+    m_cEndColor = color.value<QColor>();
     this->update();
 }
 
-void UICanvasAudioItem::onTextChanged(const QString& fileName)
+void UICanvasAudioItem::onTextChanged(const QVariant& fileName)
 {
     m_pAudioPlayer->stop();
     m_pAudioPlayer->close();
-    m_isOpenSuccessed = m_pAudioPlayer->openAudioFile(fileName);
+    m_isOpenSuccessed = m_pAudioPlayer->openAudioFile(fileName.toString());
     if (!m_isOpenSuccessed)
         return;
 

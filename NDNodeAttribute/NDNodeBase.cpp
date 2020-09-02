@@ -36,6 +36,7 @@ bool NDNodeBase::addAttribute(NDAttributeGroup* group, NDAttributeBase* attribut
         return false;
 
     group->addAttribute(attribute);
+    attribute->setParentNode(this);
     return true;
 }
 

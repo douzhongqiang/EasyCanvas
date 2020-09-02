@@ -20,8 +20,8 @@ private:
     NDBoolAttribute* m_attribute = nullptr;
 
 private slots:
-    void onAttrValueChanged(bool value);
-    void onControlValueChanged(bool value);
+    void onAttrValueChanged(const QVariant& value);
+    void onControlValueChanged(bool value, bool cmd = false);
 };
 
 #endif

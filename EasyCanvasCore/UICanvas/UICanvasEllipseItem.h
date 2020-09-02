@@ -36,7 +36,7 @@ private:
 
 private slots:
     void onValueChanged(void);
-    void onRoundValueChanged(bool value);
+    void onRoundValueChanged(const QVariant& value);
 };
 
 #endif

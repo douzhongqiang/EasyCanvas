@@ -8,6 +8,9 @@ ItemChangeNameCmd::ItemChangeNameCmd(QSharedPointer<UICanvasItemBase> pItem, con
     ,m_destName(destName)
 {
     m_srcName = m_pCanvasItem->getCurrentNode()->getNodeName();
+
+    QString name = "Changed Node Name %1 To %2";
+    this->setText(name.arg(pItem->getCurrentNode()->getNodeName()).arg(destName));
 }
 
 ItemChangeNameCmd::~ItemChangeNameCmd()

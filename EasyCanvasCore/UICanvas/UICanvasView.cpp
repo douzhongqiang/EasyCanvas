@@ -185,9 +185,29 @@ QList<NDNodeBase*> UICanvasView::getCurrentSelectedNodes(void)
     return nodes;
 }
 
+QList<UICanvasItemBase*> UICanvasView::getCurrentSelectedItems(void)
+{
+    QList<UICanvasItemBase*> selectedItems;
+
+    QList<QGraphicsItem *> items = m_pScene->selectedItems();
+    for (auto iter = items.begin(); iter != items.end(); ++iter)
+    {
+        UICanvasItemBase* canvasItem = qgraphicsitem_cast<UICanvasItemBase*>(*iter);
+        if (canvasItem)
+            selectedItems << canvasItem;
+    }
+
+    return selectedItems;
+}
+
 NDNodeBase* UICanvasView::getCurrentSceneNode(void)
 {
     return m_pScene->getCurrentNode();
+}
+
+void UICanvasView::resetSceneNode(void)
+{
+    m_pScene->resetNodeInfo();
 }
 
 QPointF UICanvasView::getCenterPos(void)

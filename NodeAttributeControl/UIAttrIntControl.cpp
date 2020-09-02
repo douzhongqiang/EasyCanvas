@@ -33,18 +33,18 @@ void UIAttrIntControl::setAttribute(NDAttributeBase* attribute)
     this->setRangeValue(min, max);
 
     // 设置值
-    this->setCurrentValue(m_attribute->getCurrentValue());
+    this->setCurrentValue(m_attribute->getValue().toInt());
     this->setTagText(m_attribute->getDisplayName());
 }
 
-void UIAttrIntControl::onAttrValueChanged(int value)
+void UIAttrIntControl::onAttrValueChanged(const QVariant& value)
 {
-    this->setCurrentValue(value);
+    this->setCurrentValue(value.toInt());
 }
 
-void UIAttrIntControl::onControlValueChanged(int value)
+void UIAttrIntControl::onControlValueChanged(int value, bool cmd)
 {
     QObject::disconnect(m_attribute, &NDIntAttribute::valueChanged, this, &UIAttrIntControl::onAttrValueChanged);
-    m_attribute->setCurrentValue(value);
+    m_attribute->setValue(value, cmd);
     QObject::connect(m_attribute, &NDIntAttribute::valueChanged, this, &UIAttrIntControl::onAttrValueChanged);
 }

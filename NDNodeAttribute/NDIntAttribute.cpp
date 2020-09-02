@@ -1,33 +1,15 @@
 #include "NDIntAttribute.h"
+#include "NDNodeManager.h"
 
 NDIntAttribute::NDIntAttribute(NDNodeBase* parentNode)
     :NDAttributeBase(parentNode)
 {
-
+    m_value = 0;
 }
 
 NDIntAttribute::~NDIntAttribute()
 {
 
-}
-
-// 设置/获取 当前值
-void NDIntAttribute::setCurrentValue(int value)
-{
-    bool needSendSignal = true;
-    if (m_nValue == value)
-        needSendSignal = false;
-
-    m_nValue = value;
-
-    // 发送信号
-    if (needSendSignal)
-        emit valueChanged(value);
-}
-
-int NDIntAttribute::getCurrentValue(void)
-{
-    return m_nValue;
 }
 
 // 设置/获取 取值范围

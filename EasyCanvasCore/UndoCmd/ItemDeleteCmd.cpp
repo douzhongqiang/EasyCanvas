@@ -6,7 +6,14 @@
 ItemDeleteCmd::ItemDeleteCmd(QList<QSharedPointer<UICanvasItemBase>> pItems)
     :m_pCanvasItems(pItems)
 {
-
+    // 设置名字
+    QString deleteNodeString = "Delete Node [%1]";
+    QStringList strs;
+    for (auto iter = pItems.begin(); iter != pItems.end(); ++iter)
+    {
+        strs << (*iter)->getCurrentNode()->getNodeName();
+    }
+    this->setText(deleteNodeString.arg(strs.join(",")));
 }
 
 ItemDeleteCmd::~ItemDeleteCmd()

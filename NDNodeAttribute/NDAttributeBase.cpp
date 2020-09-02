@@ -5,12 +5,15 @@
 #include "NDIntAttribute.h"
 #include "NDStringAttribute.h"
 #include "NDNodeBase.h"
+#include "NDNodeManager.h"
+#include "Utils.h"
 #include <QColor>
 
 NDAttributeBase::NDAttributeBase(NDNodeBase *parentNode)
     :QObject (parentNode)
 {
-
+    QObject::connect(this, &NDAttributeBase::valueChanged, \
+                     this, &NDAttributeBase::onValueChaned);
 }
 
 NDAttributeBase::~NDAttributeBase()
@@ -42,6 +45,14 @@ QString NDAttributeBase::getDisplayName(void)
     return m_displayName;
 }
 
+QString NDAttributeBase::getFullName(void)
+{
+    if (m_pParentNode == nullptr)
+        return "";
+
+    return m_pParentNode->getNodeName() + "." + m_attributeName;
+}
+
 // 设置/获取父节点
 void NDAttributeBase::setParentGroup(NDAttributeGroup* group)
 {
@@ -55,6 +66,17 @@ void NDAttributeBase::setParentGroup(NDAttributeGroup* group)
 NDAttributeGroup* NDAttributeBase::getParentGroup(void)
 {
     return m_pParentGroup;
+}
+
+// 设置/获取父节点
+void NDAttributeBase::setParentNode(NDNodeBase* node)
+{
+    m_pParentNode = node;
+}
+
+NDNodeBase* NDAttributeBase::getParentNode(void)
+{
+    return m_pParentNode;
 }
 
 // 设置/获取使能
@@ -117,81 +139,66 @@ NDAttributeBase* NDAttributeBase::createAttribute(const QString& name, Attribute
     return attribute;
 }
 
-QVariant NDAttributeBase::getCurrentValue(NDAttributeBase* pAttribute)
+QVariant NDAttributeBase::getLastValue(void)
 {
-    AttributeType attrType = pAttribute->Type();
-
-    switch (attrType)
-    {
-    case t_bool:
-    {
-        NDBoolAttribute* pValueAttr = dynamic_cast<NDBoolAttribute*>(pAttribute);
-        return pValueAttr->getCurrentValue();
-    }
-    case t_int:
-    {
-        NDIntAttribute* pValueAttr = dynamic_cast<NDIntAttribute*>(pAttribute);
-        return pValueAttr->getCurrentValue();
-    }
-    case t_qreal:
-    {
-        NDRealAttribute* pValueAttr = dynamic_cast<NDRealAttribute*>(pAttribute);
-        return pValueAttr->getCurrentValue();
-    }
-    case t_string:
-    {
-        NDStringAttribute* pValueAttr = dynamic_cast<NDStringAttribute*>(pAttribute);
-        return pValueAttr->getCurrentValue();
-    }
-    case t_color:
-    {
-        NDColorAttribute* pValueAttr = dynamic_cast<NDColorAttribute*>(pAttribute);
-        return pValueAttr->getCurrentValue();
-    }
-    default:
-        break;
-    }
-
-    return QVariant();
+    return m_lastValue;
 }
 
-void NDAttributeBase::setCurrentValue(NDAttributeBase* pAttribute, const QVariant value)
+QString NDAttributeBase::getTypeName(void)
 {
-    AttributeType attrType = pAttribute->Type();
-
-    switch (attrType)
+    AttributeType type = this->Type();
+    switch (type)
     {
     case t_bool:
-    {
-        NDBoolAttribute* pValueAttr = dynamic_cast<NDBoolAttribute*>(pAttribute);
-        pValueAttr->setCurrentValue(value.toBool());
-        break;
-    }
+        return "Bool";
     case t_int:
-    {
-        NDIntAttribute* pValueAttr = dynamic_cast<NDIntAttribute*>(pAttribute);
-        pValueAttr->setCurrentValue(value.toInt());
-        break;
-    }
+        return "Int";
     case t_qreal:
-    {
-        NDRealAttribute* pValueAttr = dynamic_cast<NDRealAttribute*>(pAttribute);
-        pValueAttr->setCurrentValue(value.toDouble());
-        break;
-    }
+        return "QReal";
     case t_string:
-    {
-        NDStringAttribute* pValueAttr = dynamic_cast<NDStringAttribute*>(pAttribute);
-        pValueAttr->setCurrentValue(value.toString());
-        break;
-    }
+        return "String";
+    case t_stringList:
+        return "StringList";
     case t_color:
+        return "Color";
+    case t_postion2d:
+        return "Postion2D";
+    }
+
+    return "";
+}
+
+// 设置/获取属性值
+void NDAttributeBase::setValue(const QVariant& value, bool cmd)
+{
+    // 处理第一次
+    if (m_isFirstSetValue)
     {
-        NDColorAttribute* pValueAttr = dynamic_cast<NDColorAttribute*>(pAttribute);
-        pValueAttr->setCurrentValue(value.value<QColor>());
-        break;
+        m_lastValue = value;
+        m_isFirstSetValue = false;
     }
-    default:
-        break;
+
+    // 判断是否需要发送信号
+    bool needSendSignal = true;
+    if (m_value == value)
+        needSendSignal = false;
+
+    QVariant tempValue = m_value;
+    m_value = value;
+
+    if (needSendSignal)
+    {
+        m_lastValue = tempValue;
+        emit valueChanged(value, cmd);
     }
+}
+
+QVariant NDAttributeBase::getValue(void)
+{
+    return m_value;
+}
+
+void NDAttributeBase::onValueChaned(const QVariant& value, bool cmd)
+{
+    g_nodeManager->informAttributeValueChanged(this, value, cmd);
 }

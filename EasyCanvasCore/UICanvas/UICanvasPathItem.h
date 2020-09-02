@@ -22,6 +22,10 @@ public:
     // 结束设置
     void endDrawPos(void);
 
+    // 获取当前属性Json
+    virtual QJsonObject getStoreJson(int interval = 0) override;
+    virtual void fillJsonInfo(const QJsonObject& jsonObject) override;
+
 protected:
     void customPaint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     //QPainterPath shape() const override;
@@ -32,6 +36,7 @@ private:
     QPointF m_painterStartPos;
 
     QPainterPath m_painterPath;
+    QVector<QPointF> m_points;
 
     // 初始化
     void initAttribute(void);

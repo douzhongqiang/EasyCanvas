@@ -6,6 +6,9 @@ ItemCreateCmd::ItemCreateCmd(int type)
     :m_nType(type)
 {
     m_itemCanvasItem.reset();
+
+    QString str("Create Node %1");
+    this->setText(str.arg(g_currentCanvasManager->getNodeTypeDisplayName((UICanvasItemManager::CanvasItemType)type)));
 }
 
 ItemCreateCmd::~ItemCreateCmd()

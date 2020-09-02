@@ -39,9 +39,9 @@ private:
     bool isPlaying(void);
 
 private slots:
-    void onStartColorValueChanged(const QColor& color);
-    void onEndColorValueChanged(const QColor& color);
-    void onTextChanged(const QString& fileName);
+    void onStartColorValueChanged(const QVariant& color);
+    void onEndColorValueChanged(const QVariant& color);
+    void onTextChanged(const QVariant& fileName);
 
     void onAudioPlayFinished(void);
 };

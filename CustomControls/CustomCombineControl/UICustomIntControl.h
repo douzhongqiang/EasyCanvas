@@ -35,6 +35,7 @@ private:
 
     int m_nMaxValue = 100;
     int m_nMinValue = 0;
+    int m_tempValue = 0;
 
     int getValuesBySlider(void);
 
@@ -47,7 +48,7 @@ private slots:
     void onIntValueChanged(void);
 
 signals:
-    void valueChanged(int);
+    void valueChanged(int value, bool cmd = false);
 };
 
 #endif

@@ -1,30 +1,15 @@
 #include "NDStringAttribute.h"
+#include "NDNodeManager.h"
 
 NDStringAttribute::NDStringAttribute(NDNodeBase* parentNode)
     :NDAttributeBase(parentNode)
 {
-
+    m_value = "";
 }
 
 NDStringAttribute::~NDStringAttribute()
 {
 
-}
-
-void NDStringAttribute::setCurrentValue(const QString& value)
-{
-    bool needSendSignal = true;
-    if (m_string == value)
-        needSendSignal = false;
-
-    m_string = value;
-    if (needSendSignal)
-        emit valueChanged(value);
-}
-
-QString NDStringAttribute::getCurrentValue(void)
-{
-    return m_string;
 }
 
 // 设置/获取是否显示按钮

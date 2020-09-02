@@ -26,7 +26,7 @@ UICustomSwitchWidget::~UICustomSwitchWidget()
 
 }
 
-void UICustomSwitchWidget::setSwitchStatus(bool isOn, bool hasAnimation)
+void UICustomSwitchWidget::setSwitchStatus(bool isOn, bool hasAnimation, bool cmd)
 {
     if (isOn)
     {
@@ -42,7 +42,7 @@ void UICustomSwitchWidget::setSwitchStatus(bool isOn, bool hasAnimation)
     if (m_isSwitchOn != isOn)
     {
         m_isSwitchOn = isOn;
-        emit valueChanged(isOn);
+        emit valueChanged(isOn, cmd);
     }
 
     // 开启动画
@@ -86,7 +86,7 @@ QSize UICustomSwitchWidget::sizeHint() const
 
 void UICustomSwitchWidget::mousePressEvent(QMouseEvent* event)
 {
-    setSwitchStatus(!m_isSwitchOn);
+    setSwitchStatus(!m_isSwitchOn, true, true);
 }
 
 void UICustomSwitchWidget::onTimeout(void)

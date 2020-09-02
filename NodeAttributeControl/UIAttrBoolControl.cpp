@@ -17,21 +17,21 @@ void UIAttrBoolControl::setAttribute(NDAttributeBase* attribute)
         return;
 
     m_attribute = qobject_cast<NDBoolAttribute*>(attribute);
-    this->setCurrentValue(m_attribute->getCurrentValue());
+    this->setCurrentValue(m_attribute->getValue().toBool());
     this->setTagText(m_attribute->getDisplayName());
 
     QObject::connect(m_attribute, &NDBoolAttribute::valueChanged, this, &UIAttrBoolControl::onAttrValueChanged);
     QObject::connect(this, &UIAttrBoolControl::valueChanged, this, &UIAttrBoolControl::onControlValueChanged);
 }
 
-void UIAttrBoolControl::onAttrValueChanged(bool value)
+void UIAttrBoolControl::onAttrValueChanged(const QVariant& value)
 {
-    this->setCurrentValue(value);
+    this->setCurrentValue(value.toBool(), false);
 }
 
-void UIAttrBoolControl::onControlValueChanged(bool value)
+void UIAttrBoolControl::onControlValueChanged(bool value, bool cmd)
 {
     QObject::disconnect(m_attribute, &NDBoolAttribute::valueChanged, this, &UIAttrBoolControl::onAttrValueChanged);
-    m_attribute->setCurrentValue(value);
+    m_attribute->setValue(value, cmd);
     QObject::connect(m_attribute, &NDBoolAttribute::valueChanged, this, &UIAttrBoolControl::onAttrValueChanged);
 }

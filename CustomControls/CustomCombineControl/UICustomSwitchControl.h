@@ -15,7 +15,7 @@ public:
     ~UICustomSwitchControl();
 
     // 设置/获取当前值
-    void setCurrentValue(bool isOn);
+    void setCurrentValue(bool isOn, bool hasAnim = true);
     bool getCurrentValue(void);
 
     // 设置右侧文本
@@ -26,7 +26,7 @@ private:
     QLabel* m_pLabel = nullptr;
 
 signals:
-    void valueChanged(bool isOn);
+    void valueChanged(bool isOn, bool cmd = false);
 };
 
 #endif

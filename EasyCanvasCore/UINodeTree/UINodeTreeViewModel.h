@@ -6,6 +6,7 @@
 
 class UICanvasItemManager;
 class UINodeItem;
+class UINodeTreeView;
 class UINodeTreeViewModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -27,16 +28,18 @@ public:
     void updateAllNodes(void);
 
     // 设置当前的TreeView
-    void setCurrentTreeView(QTreeView* pTreeView);
+    void setCurrentTreeView(UINodeTreeView* pTreeView);
 
     // 获取一个索引
     QModelIndex getIndexByName(const QString nodeName);
+
+    void refrush(void);
 
 private:
     UICanvasItemManager* m_pCanvasItemData = nullptr;
     UINodeItem* m_pRootNodeItem = nullptr;
 
-    QTreeView* m_pTreeView = nullptr;
+    UINodeTreeView* m_pTreeView = nullptr;
 
 private slots:
     void onAddedNodeItem(int nodeType, const QString& name);

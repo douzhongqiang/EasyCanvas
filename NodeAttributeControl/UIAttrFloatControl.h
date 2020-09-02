@@ -20,8 +20,8 @@ private:
     NDRealAttribute* m_attribute = nullptr;
 
 private slots:
-    void onValueChanged(qreal value);
-    void onControlValueChanged(qreal value);
+    void onValueChanged(const QVariant& value);
+    void onControlValueChanged(qreal value, bool cmd = false);
 };
 
 #endif

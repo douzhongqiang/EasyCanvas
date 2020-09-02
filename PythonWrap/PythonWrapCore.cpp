@@ -11,6 +11,8 @@
 #include "NDStringAttribute.h"
 #include "gui/PythonQtScriptingConsole.h"
 #include "UICanvas/UICanvasItemManager.h"
+#include "UICanvas/UICanvasItemBase.h"
+#include <QSharedPointer>
 #include <QDebug>
 #include <QVariant>
 
@@ -34,7 +36,7 @@ PythonWrapCore* PythonWrapCore::getInstace(void)
 void PythonWrapCore::init(void)
 {
     // init PythonQt and Python
-    PythonQt::init(PythonQt::IgnoreSiteModule | PythonQt::RedirectStdOut);
+    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule | PythonQt::ExternalHelp);
     PythonQt_QtAll::init();
 
     m_mainObject = PythonQt::self()->getMainModule();
@@ -48,7 +50,7 @@ void PythonWrapCore::setAttribute(const QString& attributeName, const QVariant& 
     int index = attributeName.indexOf(".");
     if (index < 0)
     {
-        qDebug() << "Attribute Error";
+        writeConsoleOutPut("Attribute Error");
         return;
     }
     QString nodeName = attributeName.left(index);
@@ -61,7 +63,7 @@ void PythonWrapCore::setAttribute(const QString& attributeName, const QVariant& 
         NDAttributeBase* pAttr = getAttributeByName(m_pSceneNode, attrName);
         if (pAttr == nullptr)
         {
-            qDebug() << "Attribute Error";
+            writeConsoleOutPut("Attribute Error");
             return;
         }
 
@@ -73,22 +75,194 @@ void PythonWrapCore::setAttribute(const QString& attributeName, const QVariant& 
     // 处理普通元素节点
     NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
     if (pNode == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Node ") + nodeName);
         return;
+    }
     // 获取属性
     NDAttributeBase* pAttr = getAttributeByName(pNode, attrName);
     if (pAttr == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Attribute ") + attrName);
         return;
+    }
     setAttributeValue(pAttr, var);
 }
 
-void PythonWrapCore::createNode(const QString& typeName)
+QString PythonWrapCore::createNode(const QString& typeName)
 {
-
+    UICanvasItemManager::CanvasItemType type = g_currentCanvasManager->getTypeByName(typeName);
+    if (type == UICanvasItemManager::t_None || type == UICanvasItemManager::t_CanvasItem)
+    {
+        writeConsoleOutPut("Can't Create This Type Node!");
+        return "";
+    }
+    QSharedPointer<UICanvasItemBase> node = g_currentCanvasManager->createCanvasItemByCmd(type);
+    if (node.isNull())
+    {
+        writeConsoleOutPut("Create Node Error!");
+        return "";
+    }
+    return node->getCurrentNode()->getNodeName();
 }
 
 void PythonWrapCore::deleteNode(const QString& nodeName)
 {
-    g_currentCanvasManager->deleteCanvasItem(nodeName);
+    if (g_currentCanvasManager->getNode(nodeName) == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Node ") + nodeName);
+        return;
+    }
+
+    QStringList strs;
+    strs << nodeName;
+    g_currentCanvasManager->deleteCanvasItemByCmd(strs);
+}
+
+void PythonWrapCore::changeNodeName(const QString& srcName, const QString& destName)
+{
+    if (!g_currentCanvasManager->isCanChangedName(srcName, destName))
+    {
+        writeConsoleOutPut("Can't Changed Node Name!");
+        return;
+    }
+
+    g_currentCanvasManager->changedNodeNameCmd(srcName, destName);
+}
+
+QStringList PythonWrapCore::getAllNodes(void)
+{
+    return g_currentCanvasManager->getAllNodeNames();
+}
+
+QStringList PythonWrapCore::getSelectedNodes(void)
+{
+    return g_currentCanvasManager->getSelectedNodes();
+}
+
+QString PythonWrapCore::getNodeType(const QString& nodeName)
+{
+    NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
+    if (pNode == nullptr)
+    {
+        writeConsoleOutPut("Can't Finde This Node!");
+        return "";
+    }
+
+    return g_currentCanvasManager->getTypeName((UICanvasItemManager::CanvasItemType)pNode->getNodeType());
+}
+
+QStringList PythonWrapCore::getAttributeNames(const QString& nodeName)
+{
+    QStringList strs;
+    NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
+    if (pNode == nullptr)
+    {
+        writeConsoleOutPut("Can't Finde This Node!");
+        return strs;
+    }
+
+    QList<NDAttributeGroup*> groups;
+    pNode->getAllAttributeGroups(groups);
+    for (auto iter = groups.begin(); iter != groups.end(); ++iter)
+    {
+        QList<NDAttributeBase*> attrs;
+        (*iter)->getAttributes(attrs);
+
+        for (auto nIter = attrs.begin(); nIter != attrs.end(); ++nIter)
+        {
+            strs << (*nIter)->getName();
+        }
+    }
+    return strs;
+}
+
+Q_INVOKABLE QVariant PythonWrapCore::getValue(const QString& attributeName)
+{
+    // 获取节点名称
+    int index = attributeName.indexOf(".");
+    if (index < 0)
+    {
+        writeConsoleOutPut("Attribute Error");
+        return "";
+    }
+    QString nodeName = attributeName.left(index);
+    QString attrName = attributeName.right(attributeName.length() - index - 1);
+
+    // 处理场景节点
+    if (m_pSceneNode->getNodeName() == nodeName)
+    {
+        // 获取属性指针
+        NDAttributeBase* pAttr = getAttributeByName(m_pSceneNode, attrName);
+        if (pAttr == nullptr)
+        {
+            writeConsoleOutPut("Attribute Error");
+            return "";
+        }
+
+        // 设置值
+        return pAttr->getValue();
+    }
+
+    // 处理普通元素节点
+    NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
+    if (pNode == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Node ") + nodeName);
+        return "";
+    }
+    // 获取属性
+    NDAttributeBase* pAttr = getAttributeByName(pNode, attrName);
+    if (pAttr == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Attribute ") + attrName);
+        return "";
+    }
+    return pAttr->getValue();
+}
+
+QString PythonWrapCore::getAttributeType(const QString& attributeName)
+{
+    // 获取节点名称
+    int index = attributeName.indexOf(".");
+    if (index < 0)
+    {
+        writeConsoleOutPut("Attribute Error");
+        return "";
+    }
+    QString nodeName = attributeName.left(index);
+    QString attrName = attributeName.right(attributeName.length() - index - 1);
+
+    // 处理场景节点
+    if (m_pSceneNode->getNodeName() == nodeName)
+    {
+        // 获取属性指针
+        NDAttributeBase* pAttr = getAttributeByName(m_pSceneNode, attrName);
+        if (pAttr == nullptr)
+        {
+            writeConsoleOutPut("Attribute Error");
+            return "";
+        }
+
+        // 设置值
+        return pAttr->getTypeName();
+    }
+
+    // 处理普通元素节点
+    NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
+    if (pNode == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Node ") + nodeName);
+        return "";
+    }
+    // 获取属性
+    NDAttributeBase* pAttr = getAttributeByName(pNode, attrName);
+    if (pAttr == nullptr)
+    {
+        writeConsoleOutPut(QString("Not Has This Attribute ") + attrName);
+        return "";
+    }
+    return pAttr->getTypeName();
 }
 
 void PythonWrapCore::setSceneNode(NDNodeBase* sceneNode)
@@ -96,7 +270,7 @@ void PythonWrapCore::setSceneNode(NDNodeBase* sceneNode)
     m_pSceneNode = sceneNode;
 }
 
-void PythonWrapCore::showScriptingConsole(void)
+QWidget* PythonWrapCore::getScriptConsole(void)
 {
     if (m_pScriptConsole == nullptr)
     {
@@ -104,8 +278,28 @@ void PythonWrapCore::showScriptingConsole(void)
         m_pScriptConsole->resize(800, 600);
     }
 
-    m_pScriptConsole->show();
-    m_pScriptConsole->raise();
+    return m_pScriptConsole;
+}
+
+void PythonWrapCore::writeConsoleOutPut(const QString& message)
+{
+    m_pScriptConsole->stdOut(message);
+}
+
+void PythonWrapCore::runScriptFiles(const QString& fileName)
+{
+    if (!QFile::exists(fileName))
+    {
+        writeConsoleOutPut("The Script File is not Existed!");
+        return;
+    }
+
+    QFile file(fileName);
+    file.open(QFile::ReadOnly);
+    QString pyFile = file.readAll();
+    file.close();
+
+    m_mainObject.evalScript(pyFile);
 }
 
 NDAttributeBase* PythonWrapCore::getAttributeByName(NDNodeBase* node, const QString& attrName)
@@ -132,45 +326,5 @@ void PythonWrapCore::setAttributeValue(NDAttributeBase* pAttr, const QVariant& v
     if (pAttr == nullptr)
         return;
 
-    switch (pAttr->Type())
-    {
-    case NDAttributeBase::t_bool:
-    {
-        NDBoolAttribute* pBoolAttr = qobject_cast<NDBoolAttribute*>(pAttr);
-        if (pBoolAttr)
-            pBoolAttr->setCurrentValue(var.toBool());
-        return;
-    }
-    case NDAttributeBase::t_int:
-    {
-        NDIntAttribute* pIntAttr = qobject_cast<NDIntAttribute*>(pAttr);
-        if (pIntAttr)
-            pIntAttr->setCurrentValue(var.toInt());
-        return;
-    }
-    case NDAttributeBase::t_color:
-    {
-        NDColorAttribute* pColorAttr = qobject_cast<NDColorAttribute*>(pAttr);
-        if (pColorAttr)
-        {
-            QColor color = var.value<QColor>();
-            pColorAttr->setCurrentValue(color);
-        }
-        return;
-    }
-    case NDAttributeBase::t_qreal:
-    {
-        NDRealAttribute* pRealAttr = qobject_cast<NDRealAttribute*>(pAttr);
-        if (pRealAttr)
-            pRealAttr->setCurrentValue(var.toReal());
-        return;
-    }
-    case NDAttributeBase::t_string:
-    {
-        NDStringAttribute* pStringAttr = qobject_cast<NDStringAttribute*>(pAttr);
-        if (pStringAttr)
-            pStringAttr->setCurrentValue(var.toString());
-        return;
-    }
-    }
+    pAttr->setValue(var, true);
 }

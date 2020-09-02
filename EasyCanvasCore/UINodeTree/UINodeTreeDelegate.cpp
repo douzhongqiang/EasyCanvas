@@ -1,5 +1,6 @@
 #include "UINodeTreeDelegate.h"
 #include "UINodeItem.h"
+#include "UINodeSortFilterProxyModel.h"
 #include <QLineEdit>
 
 UINodeTreeDelegate::UINodeTreeDelegate(QObject* parent)
@@ -13,12 +14,18 @@ UINodeTreeDelegate::~UINodeTreeDelegate()
 
 }
 
+void UINodeTreeDelegate::setProxyModel(UINodeSortFilterProxyModel* model)
+{
+    m_pModel = model;
+}
+
 QWidget *UINodeTreeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (!index.isValid())
         return QStyledItemDelegate::createEditor(parent, option, index);
 
-    UINodeItem* node = static_cast<UINodeItem*>(index.internalPointer());
+    QModelIndex srcIndex = m_pModel->mapToSource(index);
+    UINodeItem* node = static_cast<UINodeItem*>(srcIndex.internalPointer());
     bool isCanChangedName = node->isCanvasNode();
     if (!isCanChangedName)
         return QStyledItemDelegate::createEditor(parent, option, index);
@@ -34,7 +41,8 @@ void UINodeTreeDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     if (pLineEdit == nullptr)
         return;
 
-    UINodeItem* node = static_cast<UINodeItem*>(index.internalPointer());
+    QModelIndex srcIndex = m_pModel->mapToSource(index);
+    UINodeItem* node = static_cast<UINodeItem*>(srcIndex.internalPointer());
     pLineEdit->setText(node->getName());
 }
 

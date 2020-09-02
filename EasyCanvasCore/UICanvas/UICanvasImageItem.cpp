@@ -45,7 +45,7 @@ void UICanvasImageItem::setImage(const QString& filePath)
 
         // 设置属性
         QObject::disconnect(m_pFilePathAttribute, &NDStringAttribute::valueChanged, this, &UICanvasImageItem::onAttributeValueChanged);
-        m_pFilePathAttribute->setCurrentValue(filePath);
+        m_pFilePathAttribute->setValue(filePath);
         QObject::connect(m_pFilePathAttribute, &NDStringAttribute::valueChanged, this, &UICanvasImageItem::onAttributeValueChanged);
     }
 
@@ -84,7 +84,7 @@ bool UICanvasImageItem::showFileBrowseDialo(QString& str)
     return true;
 }
 
-void UICanvasImageItem::onAttributeValueChanged(const QString& value)
+void UICanvasImageItem::onAttributeValueChanged(const QVariant& value)
 {
-    this->setImage(value);
+    this->setImage(value.toString());
 }

@@ -16,10 +16,6 @@ public:
         return t_qreal;
     }
 
-    // 设置/获取 当前值
-    void setCurrentValue(qreal value);
-    qreal getCurrentValue(void);
-
     // 设置/获取 取值范围
     void setValueRange(qreal minValue, qreal maxValue);
     void getValueRange(qreal& minValue, qreal& maxValue);
@@ -27,10 +23,6 @@ public:
 private:
     qreal m_qMinValue = 0;
     qreal m_qMaxValue = 100;
-    qreal m_qValue = 0;
-
-signals:
-    void valueChanged(qreal value);
 };
 
 #endif

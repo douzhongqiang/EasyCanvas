@@ -6,6 +6,7 @@
 class UICanvasView;
 class QMouseEvent;
 class UICanvasPathItem;
+class NDAttributeBase;
 class UICanvasOperBase
 {
 public:
@@ -84,6 +85,14 @@ public:
 private:
     QPointF m_scenePos;
     QList<QGraphicsItem *> m_items;
+
+    QList<NDAttributeBase*> m_xAttributes;
+    QList<NDAttributeBase*> m_yAttributes;
+    QVector<QVariant> m_xValues;
+    QVector<QVariant> m_yValues;
+
+    QVector<QVariant> m_xOldValues;
+    QVector<QVariant> m_yOldValues;
 };
 
 // ---------------------------------------------------------------------

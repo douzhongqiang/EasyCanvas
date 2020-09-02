@@ -9,6 +9,11 @@
 #include "UICanvasImageItem.h"
 #include "UICanvasView.h"
 #include "UndoCmd/UndoCmdCore.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QDebug>
+#include <QJsonParseError>
+#include "NDNodeManager.h"
 
 QVector<UICanvasItemManager*> UICanvasItemManager::m_canvasList;
 int UICanvasItemManager::m_nCurrentIndex = -1;
@@ -23,6 +28,9 @@ UICanvasItemManager::UICanvasItemManager(QObject* parent)
     }
 
     m_pUndoCmdCore = new UndoCmdCore(this);
+
+    QObject::connect(g_nodeManager, &NDNodeManager::signalAttrValueChanged, \
+                     this, &UICanvasItemManager::onAttributeValueChanged);
 }
 
 UICanvasItemManager::~UICanvasItemManager()
@@ -53,6 +61,98 @@ QString UICanvasItemManager::getTypeName(CanvasItemType type)
     }
 
     return "";
+}
+
+UICanvasItemManager::CanvasItemType UICanvasItemManager::getTypeByName(const QString& name)
+{
+    if (name == "CanvasNode")
+        return t_CanvasItem;
+    else if (name == "RectNode")
+        return t_RectItem;
+    else if (name == "TextNode")
+        return t_TextItem;
+    else if (name == "EllipseNode")
+        return t_EllipseItem;
+    else if (name == "ImageNode")
+        return t_ImageItem;
+    else if (name == "PathNode")
+        return t_PathItem;
+    else if (name == "AudioNode")
+        return t_AudioItem;
+
+    return t_None;
+}
+
+void UICanvasItemManager::setCurrentMaxId(int maxId)
+{
+    m_nMaxIndex = maxId;
+}
+
+// 根节点（画布节点）
+QJsonObject UICanvasItemManager::getNodeStoreJson(NDNodeBase* pNode)
+{
+    if (pNode == nullptr)
+        return QJsonObject();
+
+    if (pNode == m_pCanvasView->getCurrentSceneNode())
+    {
+        QJsonObject object;
+        object.insert("name", pNode->getNodeName());
+        object.insert("type", pNode->getNodeType());
+
+        // 获取属性组
+        QList<NDAttributeGroup*> attrGroups;
+        pNode->getAllAttributeGroups(attrGroups);
+
+        QJsonObject attrObject;
+        for (auto iter = attrGroups.begin(); iter != attrGroups.end(); ++iter)
+        {
+            // 获取属性列表
+            QList<NDAttributeBase*> attrs;
+            (*iter)->getAttributes(attrs);
+
+            for (auto attrIter = attrs.begin(); attrIter != attrs.end(); ++attrIter)
+            {
+                QString attrName = (*attrIter)->getName();
+                QVariant value = (*attrIter)->getValue();
+
+                attrObject.insert(attrName, QJsonValue::fromVariant(value));
+            }
+        }
+
+        object.insert("attribute", attrObject);
+        return object;
+    }
+
+    auto item = getCanvasItem(pNode->getNodeName());
+    return item->getStoreJson();
+}
+
+void UICanvasItemManager::fillNodeJsonInfo(NDNodeBase* pNode, const QJsonObject& jsonObject)
+{
+    if (pNode == nullptr)
+        return;
+
+    if (pNode == m_pCanvasView->getCurrentSceneNode())
+    {
+        QJsonObject object = jsonObject.value("attribute").toObject();
+
+        for (auto iter = object.begin(); iter != object.end(); ++iter)
+        {
+            QString attrName = iter.key();
+            QVariant value = iter.value().toVariant();
+
+            NDAttributeBase* pAttr = pNode->getAttribute(attrName);
+            if (pAttr == nullptr)
+                continue;
+
+            pAttr->setValue(value);
+        }
+        return;
+    }
+
+    auto item = getCanvasItem(pNode->getNodeName());
+    return item->fillJsonInfo(jsonObject);
 }
 
 // 获取类别的图标
@@ -125,6 +225,7 @@ QSharedPointer<UICanvasItemBase> UICanvasItemManager::createCanvasItem(CanvasIte
     // 设置位置和选中
     m_pCanvasView->cleanAllSelected();
     m_pCanvasItemBase->setSelected(true);
+    m_pCanvasItemBase->setCurrentIndex(m_nMaxIndex++);
 
     // 获取属性名
     QString tempNodeName = nodeName;
@@ -240,7 +341,9 @@ bool UICanvasItemManager::isCanChangedName(const QString& srcName, const QString
 {
     // 已存在该节点
     if (m_nameHash.find(destName) != m_nameHash.end())
+    {
         return false;
+    }
 
     // 查找节点
     auto iter = m_nameHash.find(srcName);
@@ -254,7 +357,10 @@ bool UICanvasItemManager::changedNodeName(const QString& srcName, const QString&
 {
     // 已存在该节点
     if (m_nameHash.find(destName) != m_nameHash.end())
+    {
+        qDebug() << "Node Name is Existed";
         return false;
+    }
 
     // 查找节点
     auto iter = m_nameHash.find(srcName);
@@ -360,7 +466,46 @@ UICanvasView* UICanvasItemManager::getCurrentCanvasView(void)
 
 void UICanvasItemManager::cleanAll(void)
 {
+    // 重置根节点
+    m_pCanvasView->resetSceneNode();
 
+    m_cCopyString = "";
+    m_nMaxIndex = 1;
+
+    // 删除所有节点
+    for (auto iter = m_nameHash.begin(); iter != m_nameHash.end(); ++iter)
+    {
+        UICanvasItemBase* pItem = iter.value().data();
+        m_pCanvasView->removeFromScene(pItem);
+
+        NDNodeBase* pNode = pItem->getCurrentNode();
+        emit deletedNode(pNode->getNodeType(), pNode->getNodeName());
+    }
+
+    //清空 Redo/Undo栈
+    m_pUndoCmdCore->cleanUndoStack();
+    m_nameHash.clear();
+
+    // 重新计数
+    for (auto iter = m_countMap.begin(); iter != m_countMap.end(); ++iter)
+        iter->count = 0;
+    m_pCanvasItemBase.reset();
+}
+
+void UICanvasItemManager::changedAttributeValues(const QList<NDAttributeBase*>& attributes, \
+                            const QVector<QVariant>& values, bool isCmd)
+{
+    if (isCmd)
+    {
+        m_pUndoCmdCore->runChangedAttrCmd(attributes, values, true);
+        return;
+    }
+
+    int count = 0;
+    for (auto iter = attributes.begin(); iter != attributes.end(); ++iter)
+    {
+        (*iter)->setValue(values[count++]);
+    }
 }
 
 void UICanvasItemManager::setSelectedNodes(const QStringList& nodeNames)
@@ -377,6 +522,67 @@ void UICanvasItemManager::setSelectedNodes(const QStringList& nodeNames)
     }
 }
 
+QStringList UICanvasItemManager::getSelectedNodes(void)
+{
+    QStringList nodeNames;
+    QList<NDNodeBase*> nodes = m_pCanvasView->getCurrentSelectedNodes();
+    for (auto iter = nodes.begin(); iter != nodes.end(); ++iter)
+        nodeNames << (*iter)->getNodeName();
+
+    return nodeNames;
+}
+
+// 复制选中节点
+void UICanvasItemManager::copySelectNodes(void)
+{
+    QJsonArray jsonArray;
+    QList<UICanvasItemBase*> selectItems = m_pCanvasView->getCurrentSelectedItems();
+
+    int count = 0;
+    for (auto iter = selectItems.begin(); iter != selectItems.end(); ++iter)
+    {
+        jsonArray.insert(count++, (*iter)->getStoreJson(30));
+    }
+
+    // Json转为字符串
+    QJsonDocument doc(jsonArray);
+    QByteArray byteArray = doc.toJson(QJsonDocument::Compact);
+    QString jsonString(byteArray);
+
+    m_cCopyString = jsonString;
+}
+
+void UICanvasItemManager::pasteCmd(void)
+{
+    m_pUndoCmdCore->runPasteCmd();
+}
+
+QList<QSharedPointer<UICanvasItemBase>> UICanvasItemManager::paste(void)
+{
+    QList<QSharedPointer<UICanvasItemBase>> itemList;
+    QJsonParseError jsonParseError;
+    QJsonDocument doc = QJsonDocument::fromJson(m_cCopyString.toUtf8(), &jsonParseError);
+    if (jsonParseError.error != QJsonParseError::NoError)
+        return itemList;
+
+    QJsonArray array = doc.array();
+    for (auto iter = array.begin(); iter != array.end(); ++iter)
+    {
+        QJsonObject object = iter->toObject();
+
+        // 创建元素
+        CanvasItemType canvasType = (CanvasItemType)object.value("type").toInt();
+        QSharedPointer<UICanvasItemBase> canvasItem = this->createCanvasItem(canvasType);
+
+        // 设置元素属性
+        canvasItem->fillJsonInfo(object);
+
+        itemList << canvasItem;
+    }
+
+    return itemList;
+}
+
 // 撤銷和重做相关
 void UICanvasItemManager::redo(void)
 {
@@ -386,4 +592,20 @@ void UICanvasItemManager::redo(void)
 void UICanvasItemManager::undo(void)
 {
     m_pUndoCmdCore->undo();
+}
+
+// 获取Redo/Undo核心类
+UndoCmdCore* UICanvasItemManager::getCurrentUndoCmdCore(void)
+{
+    return m_pUndoCmdCore;
+}
+
+void UICanvasItemManager::onAttributeValueChanged(NDAttributeBase* pAttribute, const QVariant& value, bool cmd)
+{
+    if (!cmd)
+        return;
+
+    QList<NDAttributeBase*> attributeList;
+    attributeList << pAttribute;
+    m_pUndoCmdCore->runChangedAttrCmd(attributeList, value);
 }

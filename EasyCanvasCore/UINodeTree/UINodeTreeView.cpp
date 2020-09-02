@@ -6,6 +6,7 @@
 #include "NDNodeBase.h"
 #include <QHeaderView>
 #include <QKeyEvent>
+#include "UINodeSortFilterProxyModel.h"
 
 UINodeTreeView::UINodeTreeView(QWidget* parent)
     :QTreeView(parent)
@@ -13,10 +14,15 @@ UINodeTreeView::UINodeTreeView(QWidget* parent)
     // 设置model
     m_pModel = new UINodeTreeViewModel(this);
     m_pModel->setCurrentTreeView(this);
-    this->setModel(m_pModel);
+
+    m_pSortFilterModel = new UINodeSortFilterProxyModel;
+    m_pSortFilterModel->setSourceModel(m_pModel);
+    this->setModel(m_pSortFilterModel);
+    //this->setModel(m_pModel);
 
     // 设置Delegate
     m_pDelegate = new UINodeTreeDelegate(this);
+    m_pDelegate->setProxyModel(m_pSortFilterModel);
     this->setItemDelegate(m_pDelegate);
 
     this->expandAll();
@@ -35,6 +41,26 @@ UINodeTreeView::~UINodeTreeView()
 
 }
 
+void UINodeTreeView::setFilterString(const QString& filterString)
+{
+    m_pSortFilterModel->invalidate();
+
+//    m_pSortFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+//    m_pSortFilterModel->setFilterRegExp(filterString);
+
+    m_pSortFilterModel->setFilterString(filterString);
+
+    this->expandAll();
+}
+
+void UINodeTreeView::updateView(void)
+{
+    m_pModel->refrush();
+
+    this->expandAll();
+    this->doItemsLayout();
+}
+
 void UINodeTreeView::onItemSelectedChanged(void)
 {
     UICanvasView* pCanvasView = g_currentCanvasManager->getCurrentCanvasView();
@@ -50,9 +76,11 @@ void UINodeTreeView::onItemSelectedChanged(void)
     {
         // 获取节点的索引
         QModelIndex index = m_pModel->getIndexByName(pNode->getNodeName());
+        if (!index.isValid())
+            continue;
 
         // 选中
-        pSelectonModel->select(index, QItemSelectionModel::Select);
+        pSelectonModel->select(m_pSortFilterModel->mapFromSource(index), QItemSelectionModel::Select);
     }
 
     QObject::connect(pSelectonModel, &QItemSelectionModel::selectionChanged, this, &UINodeTreeView::onSelectionChanged);

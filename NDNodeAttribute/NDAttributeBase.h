@@ -29,9 +29,15 @@ public:
     virtual AttributeType Type(void) const = 0 ;
 
     static NDAttributeBase* createAttribute(const QString& name, AttributeType type, const QString& displayName = "");
-    // 设置/获取属性
-    static QVariant getCurrentValue(NDAttributeBase* pAttribute);
-    static void setCurrentValue(NDAttributeBase* pAttribute, const QVariant value);
+
+    // 获取上一次的属性值
+    QVariant getLastValue(void);
+    // 类型名转字符串
+    QString getTypeName(void);
+
+    // 设置/获取属性值
+    virtual void setValue(const QVariant& value, bool cmd = false);
+    virtual QVariant getValue(void);
 
     // 设置名字
     void setName(const QString& name);
@@ -41,25 +47,41 @@ public:
     void setDisplayName(const QString& name);
     QString getDisplayName(void);
 
-    // 设置/获取父节点
+    // 获取全名
+    QString getFullName(void);
+
+    // 设置/获取父节点组
     void setParentGroup(NDAttributeGroup* group);
     NDAttributeGroup* getParentGroup(void);
+
+    // 设置/获取父节点
+    void setParentNode(NDNodeBase* node);
+    NDNodeBase* getParentNode(void);
 
     // 设置/获取使能
     void setEnable(bool isEnabled);
     bool isEnable(void);
 
-private:
+protected:
     AttributeType m_attributeType;
     QString m_attributeName;
     QString m_displayName;
 
     bool m_isEnabled = true;
+    QVariant m_lastValue;
+    QVariant m_value;
+
+    bool m_isFirstSetValue = true;
 
     NDAttributeGroup* m_pParentGroup = nullptr;
+    NDNodeBase* m_pParentNode = nullptr;
 
 signals:
     void enabledChanged(bool enabled);
+    void valueChanged(const QVariant& value, bool cmd = false);
+
+private slots:
+    void onValueChaned(const QVariant& value, bool cmd);
 };
 
 #endif

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     g_StyleConfig->loadLanguage("./CustomNormalCode_zh_CH.qm");
 
     MainWindow w;
+    w.initGlobalHotKey();
     w.showMaximized();
 
     return a.exec();

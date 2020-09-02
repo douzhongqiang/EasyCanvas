@@ -1,33 +1,16 @@
 #include "NDRealAttribute.h"
 #include "Utils.h"
+#include "NDNodeManager.h"
 
 NDRealAttribute::NDRealAttribute(NDNodeBase* parentNode)
     :NDAttributeBase(parentNode)
 {
-
+    m_value = 0;
 }
 
 NDRealAttribute::~NDRealAttribute()
 {
 
-}
-
-// 设置/获取 当前值
-void NDRealAttribute::setCurrentValue(qreal value)
-{
-    bool needSendSignal = true;
-    if (g_utilTool->isEqual(m_qValue, value))
-        needSendSignal = false;
-
-    m_qValue = value;
-
-    if (needSendSignal)
-        emit valueChanged(value);
-}
-
-qreal NDRealAttribute::getCurrentValue(void)
-{
-    return m_qValue;
 }
 
 // 设置/获取 取值范围

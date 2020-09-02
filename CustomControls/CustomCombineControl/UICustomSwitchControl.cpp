@@ -24,9 +24,9 @@ UICustomSwitchControl::~UICustomSwitchControl()
 }
 
 // 设置/获取当前值
-void UICustomSwitchControl::setCurrentValue(bool isOn)
+void UICustomSwitchControl::setCurrentValue(bool isOn, bool hasAnim)
 {
-    m_pSwitchWidget->setSwitchStatus(isOn, true);
+    m_pSwitchWidget->setSwitchStatus(isOn, hasAnim);
 }
 
 bool UICustomSwitchControl::getCurrentValue(void)

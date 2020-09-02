@@ -15,6 +15,8 @@ public:
 
     // 获取节点
     NDNodeBase* getCurrentNode(void);
+    // 初始化节点属性
+    void resetNodeInfo(void);
 
 protected:
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -33,9 +35,9 @@ private:
     NDColorAttribute* m_pBackgroundColorAttribute = nullptr;
 
 private slots:
-    void onWidthAttributeValueChanged(int value);
-    void onHeightAttributeValueChanged(int value);
-    void onColorAttributeValueChanged(const QColor& value);
+    void onWidthAttributeValueChanged(const QVariant& value);
+    void onHeightAttributeValueChanged(const QVariant& value);
+    void onColorAttributeValueChanged(const QVariant& value);
 };
 
 #endif

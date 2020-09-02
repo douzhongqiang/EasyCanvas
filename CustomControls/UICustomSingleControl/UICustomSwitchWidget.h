@@ -13,7 +13,7 @@ public:
     UICustomSwitchWidget(QWidget* parent = nullptr);
     ~UICustomSwitchWidget();
 
-    void setSwitchStatus(bool isOn, bool hasAnimation = true);
+    void setSwitchStatus(bool isOn, bool hasAnimation = true, bool cmd = false);
     bool getSwitchStatus(void);
 
 protected:
@@ -45,7 +45,7 @@ private slots:
     void onTimeout(void);
 
 signals:
-    void valueChanged(bool isOn);
+    void valueChanged(bool isOn, bool cmd = false);
 };
 
 #endif

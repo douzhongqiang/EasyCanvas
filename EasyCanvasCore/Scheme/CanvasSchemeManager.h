@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QSet>
+#include <set>
 #include "easycanvascore_global.h"
 #include "SchemeDataInfo.h"
 
@@ -34,7 +35,7 @@ public:
     void changedSchemeName(const QString& name, const QString& destName);
 
     // 获取全部数据
-    QSet<SchemeDataInfo::SchemeInfo> getSchemeInfoList(void);
+    std::set<SchemeDataInfo::SchemeInfo> getSchemeInfoList(void);
     // 获取方案名
     QString getSchemeName(int index);
     SchemeDataInfo::SchemeInfo getSchemeInfo(int index);
@@ -52,7 +53,7 @@ private:
     QString m_schemeName;
 
     // 方案管理数据信息
-    QSet<SchemeDataInfo::SchemeInfo> m_schemeInfos;
+    std::set<SchemeDataInfo::SchemeInfo> m_schemeInfos;
     // 从数据库同步方案
     void syncSchemeInfoFromDB(void);
     // 将图片转化为缩略图

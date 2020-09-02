@@ -3,6 +3,7 @@
 UIAttrTextControl::UIAttrTextControl(NDAttributeBase* attribute, QWidget* parent)
     :UICustomLineEditControl(parent)
 {
+    m_tempString = "EasyCanvas";
     setAttribute(attribute);
 
     if (m_attribute == nullptr)
@@ -28,7 +29,7 @@ void UIAttrTextControl::setAttribute(NDAttributeBase* attribute)
     if (m_attribute == nullptr)
         return;
 
-    this->setText(m_attribute->getCurrentValue());
+    this->setText(m_attribute->getValue().toString());
     this->setTagText(m_attribute->getDisplayName());
 
     QObject::connect(m_attribute, &NDStringAttribute::valueChanged, this, &UIAttrTextControl::onTextAttrValueChanged);
@@ -36,24 +37,30 @@ void UIAttrTextControl::setAttribute(NDAttributeBase* attribute)
     QObject::connect(this, &UIAttrTextControl::editingFinished, this, &UIAttrTextControl::onControlEditFinished);
 }
 
-void UIAttrTextControl::onTextAttrValueChanged(const QString& value)
+void UIAttrTextControl::onTextAttrValueChanged(const QVariant& value)
 {
-    this->setText(value);
+    this->blockSignals(true);
+    this->setText(value.toString());
+    this->blockSignals(false);
 }
 
 void UIAttrTextControl::onControlTextChanged(const QString& value)
 {
     QObject::disconnect(m_attribute, &NDStringAttribute::valueChanged, this, &UIAttrTextControl::onTextAttrValueChanged);
-    m_attribute->setCurrentValue(value);
+    m_attribute->setValue(value);
     QObject::connect(m_attribute, &NDStringAttribute::valueChanged, this, &UIAttrTextControl::onTextAttrValueChanged);
 }
 
 void UIAttrTextControl::onControlEditFinished(void)
 {
     QString text = this->getText();
+    if (m_tempString == text)
+        return;
 
     QObject::disconnect(m_attribute, &NDStringAttribute::valueChanged, this, &UIAttrTextControl::onTextAttrValueChanged);
-    m_attribute->setCurrentValue(text);
+    m_attribute->setValue(m_tempString);
+    m_tempString = text;
+    m_attribute->setValue(text, true);
     QObject::connect(m_attribute, &NDStringAttribute::valueChanged, this, &UIAttrTextControl::onTextAttrValueChanged);
 }
 
@@ -66,6 +73,6 @@ void UIAttrTextControl::onClickedToolButton(void)
         QString str = "";
         bool result = func(str);
         if (result)
-            m_attribute->setCurrentValue(str);
+            m_attribute->setValue(str, true);
     }
 }

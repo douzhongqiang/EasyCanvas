@@ -16,10 +16,6 @@ public:
         return t_string;
     }
 
-    // 设置/获取当前值
-    void setCurrentValue(const QString& value);
-    QString getCurrentValue(void);
-
     // 设置/获取是否显示按钮
     void setShowButton(bool isShow);
     bool isShowButton(void);
@@ -33,14 +29,10 @@ public:
     std::function<bool(QString&)> getButtonFunction(void);
 
 private:
-    QString m_string;
 
     bool m_isShowButton = false;
     QString m_buttonString = "";
     std::function<bool(QString&)> m_buttonFunc;
-
-signals:
-    void valueChanged(const QString& value);
 };
 
 #endif

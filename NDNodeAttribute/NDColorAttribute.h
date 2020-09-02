@@ -15,16 +15,6 @@ public:
     AttributeType Type(void) const override{
         return t_color;
     }
-
-    // 设置/获取当前颜色
-    void setCurrentValue(const QColor& value);
-    QColor getCurrentValue(void);
-
-private:
-    QColor m_nValue;
-
-signals:
-    void valueChanged(const QColor& value);
 };
 
 #endif

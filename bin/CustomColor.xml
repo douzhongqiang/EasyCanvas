@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomColor>
-    <Color red="197" blue="189" green="34"/>
-    <Color red="255" blue="30" green="0"/>
-    <Color red="133" blue="60" green="58"/>
-    <Color red="35" blue="72" green="190"/>
-    <Color red="171" blue="114" green="23"/>
-    <Color red="67" blue="214" green="207"/>
-    <Color red="255" blue="123" green="0"/>
-    <Color red="0" blue="255" green="145"/>
-    <Color red="0" blue="0" green="0"/>
-    <Color red="86" blue="15" green="121"/>
-    <Color red="148" blue="148" green="148"/>
-    <Color red="202" blue="35" green="174"/>
-    <Color red="25" blue="100" green="94"/>
-    <Color red="255" blue="16" green="100"/>
+    <Color green="34" blue="189" red="197"/>
+    <Color green="0" blue="30" red="255"/>
+    <Color green="58" blue="60" red="133"/>
+    <Color green="190" blue="72" red="35"/>
+    <Color green="23" blue="114" red="171"/>
+    <Color green="207" blue="214" red="67"/>
+    <Color green="0" blue="123" red="255"/>
+    <Color green="145" blue="255" red="0"/>
+    <Color green="0" blue="0" red="0"/>
+    <Color green="121" blue="15" red="86"/>
+    <Color green="148" blue="148" red="148"/>
+    <Color green="0" blue="255" red="0"/>
+    <Color green="94" blue="100" red="25"/>
+    <Color green="100" blue="16" red="255"/>
 </CustomColor>

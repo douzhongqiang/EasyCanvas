@@ -58,7 +58,7 @@ SchemeManagerModel::~SchemeManagerModel()
 
 int SchemeManagerModel::rowCount(const QModelIndex &parent) const
 {
-    const QSet<SchemeDataInfo::SchemeInfo>& infos = g_CanvasSchemeManager->getSchemeInfoList();
+    const std::set<SchemeDataInfo::SchemeInfo>& infos = g_CanvasSchemeManager->getSchemeInfoList();
     return infos.size();
 }
 
@@ -70,7 +70,7 @@ QVariant SchemeManagerModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole)
     {
         int rowIndex = index.row();
-        const QSet<SchemeDataInfo::SchemeInfo>& infos = g_CanvasSchemeManager->getSchemeInfoList();
+        const std::set<SchemeDataInfo::SchemeInfo>& infos = g_CanvasSchemeManager->getSchemeInfoList();
         if (infos.size() <= rowIndex)
             return QVariant();
 

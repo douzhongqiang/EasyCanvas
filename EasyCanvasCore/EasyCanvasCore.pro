@@ -46,7 +46,6 @@ SOURCES += \
         Scheme/SQLCore.cpp \
         Scheme/UISchemeManagerDialog.cpp \
         Scheme/UISchemeManagerWidget.cpp \
-        UICanvas/UICanvasArrows.cpp \
         UICanvas/UICanvasAudioItem.cpp \
         UICanvas/UICanvasEllipseItem.cpp \
         UICanvas/UICanvasImageItem.cpp \
@@ -59,13 +58,16 @@ SOURCES += \
         UICanvas/UICanvasTextItem.cpp \
         UICanvas/UICanvasView.cpp \
         UINodeTree/UINodeItem.cpp \
+        UINodeTree/UINodeSortFilterProxyModel.cpp \
         UINodeTree/UINodeTreeDelegate.cpp \
         UINodeTree/UINodeTreeView.cpp \
         UINodeTree/UINodeTreeViewModel.cpp \
+        UINodeTree/UINodeTreeWidget.cpp \
         UndoCmd/ItemAttributeChangedCmd.cpp \
         UndoCmd/ItemChangeNameCmd.cpp \
         UndoCmd/ItemCreateCmd.cpp \
         UndoCmd/ItemDeleteCmd.cpp \
+        UndoCmd/ItemPasteCmd.cpp \
         UndoCmd/UndoCmdCore.cpp
 
 HEADERS += \
@@ -74,7 +76,6 @@ HEADERS += \
         Scheme/SchemeDataInfo.h \
         Scheme/UISchemeManagerDialog.h \
         Scheme/UISchemeManagerWidget.h \
-        UICanvas/UICanvasArrows.h \
         UICanvas/UICanvasAudioItem.h \
         UICanvas/UICanvasEllipseItem.h \
         UICanvas/UICanvasImageItem.h \
@@ -87,13 +88,16 @@ HEADERS += \
         UICanvas/UICanvasTextItem.h \
         UICanvas/UICanvasView.h \
         UINodeTree/UINodeItem.h \
+        UINodeTree/UINodeSortFilterProxyModel.h \
         UINodeTree/UINodeTreeDelegate.h \
         UINodeTree/UINodeTreeView.h \
         UINodeTree/UINodeTreeViewModel.h \
+        UINodeTree/UINodeTreeWidget.h \
         UndoCmd/ItemAttributeChangedCmd.h \
         UndoCmd/ItemChangeNameCmd.h \
         UndoCmd/ItemCreateCmd.h \
         UndoCmd/ItemDeleteCmd.h \
+        UndoCmd/ItemPasteCmd.h \
         UndoCmd/UndoCmdCore.h \
         easycanvascore_global.h 
 

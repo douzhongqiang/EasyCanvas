@@ -18,9 +18,10 @@ public:
 
 private:
     NDStringAttribute* m_attribute = nullptr;
+    QString m_tempString;
 
 private slots:
-    void onTextAttrValueChanged(const QString& value);
+    void onTextAttrValueChanged(const QVariant& value);
     void onControlTextChanged(const QString& value);
     void onControlEditFinished(void);
 

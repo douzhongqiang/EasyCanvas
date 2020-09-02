@@ -48,8 +48,8 @@ private:
 
 private slots:
     void onValueChanged(void);
-    void onTextValueChanged(const QString& text);
-    void onFontSizeValueChanged(int fontSize);
+    void onTextValueChanged(const QVariant& text);
+    void onFontSizeValueChanged(const QVariant& fontSize);
 };
 
 #endif

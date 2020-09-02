@@ -9,6 +9,7 @@
 #include <QVector3D>
 #include <cmath>
 #include <math.h>
+#include <QJsonObject>
 #include "NDNodeBase.h"
 #include "NDAttributeBase.h"
 #include "NDRealAttribute.h"
@@ -53,22 +54,6 @@ void UICanvasItemBase::setItemResizeable(bool resizeable)
 NDNodeBase* UICanvasItemBase::getCurrentNode(void) const
 {
     return m_pNode;
-}
-
-// 拷贝另一元素到自身数据中
-void UICanvasItemBase::copyFromItem(UICanvasItemBase* pItem)
-{
-    if (pItem == nullptr || pItem->m_pNode->getNodeType() != m_pNode->getNodeType())
-        return;
-
-    m_pXPostionAttribute->setCurrentValue(pItem->m_pXPostionAttribute->getCurrentValue());
-    m_pYPostionAttribute->setCurrentValue(pItem->m_pYPostionAttribute->getCurrentValue());
-    m_pZPostionAttribute->setCurrentValue(pItem->m_pZPostionAttribute->getCurrentValue());
-
-    m_pWidthAttribute->setCurrentValue(pItem->m_pWidthAttribute->getCurrentValue());
-    m_pHeightAttribute->setCurrentValue(pItem->m_pHeightAttribute->getCurrentValue());
-
-    m_pRotateAttribute->setCurrentValue(pItem->m_pRotateAttribute->getCurrentValue());
 }
 
 void UICanvasItemBase::setItemResizeRatio(bool resizeRation, qreal rationValue)
@@ -172,6 +157,8 @@ void UICanvasItemBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
     m_pos = pos;
     m_pressedPos = scenePos;
     m_startPos = this->pos();
+    m_startRotate = m_rotate;
+    m_startSize = m_size;
     return QGraphicsItem::mousePressEvent(event);
 }
 
@@ -202,6 +189,26 @@ void UICanvasItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void UICanvasItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    // 获取场景坐标和本地坐标
+    QPointF scenePos = event->scenePos();
+    QPointF pos = event->pos();
+
+    if (m_itemOper == t_move)
+    {
+        // 处理移动
+        mouseReleaseMoveOperator(scenePos, pos);
+    }
+    else if (m_itemOper == t_resize)
+    {
+        // 处理更改大小
+        mouseReleaseResizeOperator(scenePos, pos);
+    }
+    else if (m_itemOper == t_rotate)
+    {
+        // 处理旋转
+        mouseReleaseRotateOperator(scenePos, pos);
+    }
+
     m_itemOper = t_none;
     return QGraphicsItem::mouseReleaseEvent(event);
 }
@@ -243,8 +250,8 @@ void UICanvasItemBase::mouseMoveResizeOperator(const QPointF& scenePos, const QP
         return;
 
     m_size = QSize(itemWidth, itemHeight);
-    m_pWidthAttribute->setCurrentValue(m_size.width());
-    m_pHeightAttribute->setCurrentValue(m_size.height());
+    m_pWidthAttribute->setValue(m_size.width());
+    m_pHeightAttribute->setValue(m_size.height());
 
     this->update();
 }
@@ -287,9 +294,45 @@ void UICanvasItemBase::mouseMoveRotateOperator(const QPointF& scenePos, const QP
     QTransform transform;
     transform.rotate(m_rotate);
     this->setTransform(transform);
-    m_pRotateAttribute->setCurrentValue(m_rotate);
+    m_pRotateAttribute->setValue(m_rotate);
 
     this->update();
+}
+
+void UICanvasItemBase::mouseReleaseMoveOperator(const QPointF& scenePos, const QPointF& loacalPos)
+{
+    QList<NDAttributeBase*> attributes;
+    QVector<QVariant> values;
+    QVector<QVariant> oldValues;
+
+    attributes << m_pXPostionAttribute << m_pYPostionAttribute;
+    oldValues << m_startPos.x() << m_startPos.y();
+    values << this->pos().x() << this->pos().y();
+
+    g_currentCanvasManager->changedAttributeValues(attributes, oldValues);
+    g_currentCanvasManager->changedAttributeValues(attributes, values, true);
+}
+
+void UICanvasItemBase::mouseReleaseResizeOperator(const QPointF& scenePos, const QPointF& loacalPos)
+{
+    QList<NDAttributeBase*> attributes;
+    QVector<QVariant> values;
+    QVector<QVariant> oldValues;
+
+    attributes << m_pWidthAttribute << m_pHeightAttribute;
+    oldValues << m_startSize.width() << m_startSize.height();
+    values << m_size.width() << m_size.height();
+
+    g_currentCanvasManager->changedAttributeValues(attributes, oldValues);
+    g_currentCanvasManager->changedAttributeValues(attributes, values, true);
+}
+
+void UICanvasItemBase::mouseReleaseRotateOperator(const QPointF& scenePos, const QPointF& loacalPos)
+{
+    qreal tempRotate = m_rotate;
+
+    m_pRotateAttribute->setValue(m_startRotate);
+    m_pRotateAttribute->setValue(tempRotate, true);
 }
 
 void UICanvasItemBase::customPaint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -364,7 +407,7 @@ void UICanvasItemBase::initNodeBase(void)
     m_pRotateAttribute->setDisplayName(tr("Rotate Angle: "));
     m_pRotateAttribute->setName("rotate");
     m_pRotateAttribute->setValueRange(0, 360);
-    m_pRotateAttribute->setCurrentValue(0);
+    m_pRotateAttribute->setValue(0);
     m_pNode->addAttribute(pGroup, m_pRotateAttribute);
 
     // 连接信号和槽
@@ -380,48 +423,109 @@ void UICanvasItemBase::updateAttribute(void)
 {
     QPointF pos = this->pos();
 
-    m_pXPostionAttribute->setCurrentValue(pos.x());
-    m_pYPostionAttribute->setCurrentValue(pos.y());
-    m_pZPostionAttribute->setCurrentValue(this->zValue());
+    m_pXPostionAttribute->setValue(pos.x());
+    m_pYPostionAttribute->setValue(pos.y());
+    m_pZPostionAttribute->setValue(this->zValue());
 
-    m_pWidthAttribute->setCurrentValue(m_size.width());
-    m_pHeightAttribute->setCurrentValue(m_size.height());
+    m_pWidthAttribute->setValue(m_size.width());
+    m_pHeightAttribute->setValue(m_size.height());
 
-    m_pRotateAttribute->setCurrentValue(m_rotate);
+    m_pRotateAttribute->setValue(m_rotate);
 }
 
-void UICanvasItemBase::onXPostionAttributeValueChanged(qreal value)
+// 获取属性字符串
+QJsonObject UICanvasItemBase::getStoreJson(int interval)
+{
+    QJsonObject object;
+    object.insert("name", m_pNode->getNodeName());
+    object.insert("type", m_pNode->getNodeType());
+
+    // 获取属性组
+    QList<NDAttributeGroup*> attrGroups;
+    m_pNode->getAllAttributeGroups(attrGroups);
+
+    QJsonObject attrObject;
+    for (auto iter = attrGroups.begin(); iter != attrGroups.end(); ++iter)
+    {
+        // 获取属性列表
+        QList<NDAttributeBase*> attrs;
+        (*iter)->getAttributes(attrs);
+
+        for (auto attrIter = attrs.begin(); attrIter != attrs.end(); ++attrIter)
+        {
+            QString attrName = (*attrIter)->getName();
+            QVariant value = (*attrIter)->getValue();
+
+            if (attrName == "xPt" || attrName == "yPt")
+                value = value.toDouble() + interval;
+
+            attrObject.insert(attrName, QJsonValue::fromVariant(value));
+        }
+    }
+
+    object.insert("attribute", attrObject);
+    return object;
+}
+
+void UICanvasItemBase::fillJsonInfo(const QJsonObject& jsonObject)
+{
+    QJsonObject object = jsonObject.value("attribute").toObject();
+
+    for (auto iter = object.begin(); iter != object.end(); ++iter)
+    {
+        QString attrName = iter.key();
+        QVariant value = iter.value().toVariant();
+
+        NDAttributeBase* pAttr = m_pNode->getAttribute(attrName);
+        if (pAttr == nullptr)
+            continue;
+
+        pAttr->setValue(value);
+    }
+}
+
+void UICanvasItemBase::setCurrentIndex(int index)
+{
+    m_nIndex = index;
+}
+
+int UICanvasItemBase::getCurrentIndex(void)
+{
+    return m_nIndex;
+}
+
+void UICanvasItemBase::onXPostionAttributeValueChanged(const QVariant& value)
 {
     QPointF pos = this->pos();
-    pos.setX(value);
+    pos.setX(value.toDouble());
 
     this->setPos(pos);
 }
 
-void UICanvasItemBase::onYPostionAttributeValueChanged(qreal value)
+void UICanvasItemBase::onYPostionAttributeValueChanged(const QVariant& value)
 {
     QPointF pos = this->pos();
-    pos.setY(value);
+    pos.setY(value.toDouble());
 
     this->setPos(pos);
 }
 
-void UICanvasItemBase::onZPostionAttributeValueChanged(qreal value)
+void UICanvasItemBase::onZPostionAttributeValueChanged(const QVariant& value)
 {
-    this->setZValue(value);
+    this->setZValue(value.toDouble());
 }
 
-void UICanvasItemBase::onWidthAttributeValueChanged(int value)
+void UICanvasItemBase::onWidthAttributeValueChanged(const QVariant& value)
 {
     if (!m_isResizeable)
     {
         RALLBlockSingal wdithBlockSingal(m_pWidthAttribute);
-        m_pWidthAttribute->setCurrentValue(m_size.width());
+        m_pWidthAttribute->setValue(m_size.width());
         return;
     }
 
     qreal ratio = m_ratioValue;
-    qreal itemWidth = value;
+    qreal itemWidth = value.toInt();
     qreal itemHeight = m_size.height();
     if (m_isRatioScale)
         itemHeight = itemWidth * 1.0 / ratio;
@@ -430,7 +534,7 @@ void UICanvasItemBase::onWidthAttributeValueChanged(int value)
     if (itemWidth < 10 || itemHeight < 10)
     {
         RALLBlockSingal wdithBlockSingal(m_pWidthAttribute);
-        m_pWidthAttribute->setCurrentValue(m_size.width());
+        m_pWidthAttribute->setValue(m_size.width());
         return;
     }
 
@@ -438,25 +542,25 @@ void UICanvasItemBase::onWidthAttributeValueChanged(int value)
     m_size.setHeight(itemHeight);
 
     QObject::disconnect(m_pHeightAttribute, &NDIntAttribute::valueChanged, this, &UICanvasItemBase::onHeightAttributeValueChanged);
-    m_pHeightAttribute->setCurrentValue(itemHeight);
+    m_pHeightAttribute->setValue((int)itemHeight);
     QObject::connect(m_pHeightAttribute, &NDIntAttribute::valueChanged, this, &UICanvasItemBase::onHeightAttributeValueChanged);
 
     this->update();
     this->prepareGeometryChange();
 }
 
-void UICanvasItemBase::onHeightAttributeValueChanged(int value)
+void UICanvasItemBase::onHeightAttributeValueChanged(const QVariant& value)
 {
     if (!m_isResizeable)
     {
         RALLBlockSingal wdithBlockSingal(m_pHeightAttribute);
-        m_pHeightAttribute->setCurrentValue(m_size.height());
+        m_pHeightAttribute->setValue(m_size.height());
         return;
     }
 
     qreal ratio = m_ratioValue;
     qreal itemWidth = m_size.width();
-    qreal itemHeight = value;
+    qreal itemHeight = value.toInt();
     if (m_isRatioScale)
         itemWidth = itemHeight * 1.0 * ratio;
 
@@ -464,7 +568,7 @@ void UICanvasItemBase::onHeightAttributeValueChanged(int value)
     if (itemWidth < 10 || itemHeight < 10)
     {
         RALLBlockSingal wdithBlockSingal(m_pHeightAttribute);
-        m_pHeightAttribute->setCurrentValue(m_size.height());
+        m_pHeightAttribute->setValue(m_size.height());
         return;
     }
 
@@ -472,16 +576,16 @@ void UICanvasItemBase::onHeightAttributeValueChanged(int value)
     m_size.setHeight(itemHeight);
 
     QObject::disconnect(m_pWidthAttribute, &NDIntAttribute::valueChanged, this, &UICanvasItemBase::onWidthAttributeValueChanged);
-    m_pWidthAttribute->setCurrentValue(itemWidth);
+    m_pWidthAttribute->setValue((int)itemWidth);
     QObject::connect(m_pWidthAttribute, &NDIntAttribute::valueChanged, this, &UICanvasItemBase::onWidthAttributeValueChanged);
 
     this->update();
     this->prepareGeometryChange();
 }
 
-void UICanvasItemBase::onRotateAttributeValueChanged(qreal value)
+void UICanvasItemBase::onRotateAttributeValueChanged(const QVariant& value)
 {
-    m_rotate = value;
+    m_rotate = value.toDouble();
 
     QTransform transform;
     transform.rotate(m_rotate);

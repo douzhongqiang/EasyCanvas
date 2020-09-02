@@ -1,6 +1,7 @@
 #include "UISchemeManagerDialog.h"
 #include "UISchemeManagerWidget.h"
 #include "CanvasSchemeManager.h"
+#include "UICanvas/UICanvasItemManager.h"
 #include <QVBoxLayout>
 
 UISchemeManagerDialog::UISchemeManagerDialog(QWidget* parent)
@@ -74,6 +75,7 @@ void UISchemeManagerDialog::onClickedOpenButton(void)
     this->close();
 
     // 打开方案
+    g_currentCanvasManager->cleanAll();
     g_CanvasSchemeManager->setCurrentSchemeName(schemeName);
     g_CanvasSchemeManager->openScheme();
 }

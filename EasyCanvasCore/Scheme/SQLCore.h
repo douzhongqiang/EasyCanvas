@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <set>
 #include "SchemeDataInfo.h"
 
 class QSqlQuery;
@@ -27,7 +28,7 @@ public:
 
     // 查找
     // 获取方案列表
-    void getSchemeInfoList(QSet<SchemeDataInfo::SchemeInfo>& infos);
+    void getSchemeInfoList(std::set<SchemeDataInfo::SchemeInfo>& infos);
     // 插入方案数据
     void insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info);
     // 编辑方案数据
@@ -48,21 +49,8 @@ private:
     QString m_baseAttrAppendString;
     QString m_schemeTableName;
 
-    // 创建扩展属性表
-    void createExternTables(const QString schemeName, int type);
-    // 获取插入SQL字符串
-    QString getExternAttrInsertString(const QString& schemeName, int type);
-
     // 获取当前的索引计数，组合字符串
     QString getCurrentIndexCountString(void);
-
-    // 设置基本属性
-    void setBaseAttr(const QString& schemeName, NDNodeBase* pNode, int index);
-    // 设置扩展属性
-    void setExtendAttr(const QString& schemeName, NDNodeBase* pNode, int canvasType, int index);
-
-    // 颜色字符串转颜色
-    QColor string2Color(const QString& colorString);
 };
 
 #endif

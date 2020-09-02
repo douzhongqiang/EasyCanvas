@@ -13,6 +13,7 @@ class NDNodeBase;
 class UICanvasItemBase;
 class UICanvasView;
 class UndoCmdCore;
+class NDAttributeBase;
 
 #define g_currentCanvasManager UICanvasItemManager::getCurrentCanvasManager()
 
@@ -37,7 +38,6 @@ public:
 
     struct TypeNodeInfo
     {
-        QList<NDNodeBase*> nodes;       // 所有的节点列表
         quint64 count = 0;                  // 计数
         QIcon iconPixmap;
     };
@@ -69,6 +69,17 @@ public:
     void cleanAll(void);
     // 设置当前的选择列表
     void setSelectedNodes(const QStringList& nodeNames);
+    QStringList getSelectedNodes(void);
+
+    // 复制选中节点
+    void copySelectNodes(void);
+    // 粘贴
+    void pasteCmd(void);
+    QList<QSharedPointer<UICanvasItemBase>> paste(void);
+
+    // 批量修该节点属性
+    void changedAttributeValues(const QList<NDAttributeBase*>& attributes, \
+                                const QVector<QVariant>& values, bool isCmd = false);
 
     // 设置/获取当前的Canvas
     void setCurrentCanvasView(UICanvasView* canvasView);
@@ -96,12 +107,27 @@ public:
     void redo(void);
     void undo(void);
 
+    // 获取Redo/Undo核心类
+    UndoCmdCore* getCurrentUndoCmdCore(void);
+
+public:
+    // 类型转化为字符串名字
+    QString getTypeName(CanvasItemType type);
+    CanvasItemType getTypeByName(const QString& name);
+
+    // 设置当前最大ID
+    void setCurrentMaxId(int maxId);
+
+    // 根节点（画布节点）
+    QJsonObject getNodeStoreJson(NDNodeBase* pNode);
+    void fillNodeJsonInfo(NDNodeBase* pNode, const QJsonObject& jsonObject);
+
 private:
+    int m_nMaxIndex = 1;    // 最大索引
+
     QHash<QString, QSharedPointer<UICanvasItemBase>> m_nameHash;
     QMap<CanvasItemType, TypeNodeInfo> m_countMap;
 
-    // 类型转化为字符串名字
-    QString getTypeName(CanvasItemType type);
     // 获取类别的图标
     QIcon getTypeIcon(CanvasItemType type);
 
@@ -115,10 +141,16 @@ private:
     UndoCmdCore* m_pUndoCmdCore = nullptr;
     QSharedPointer<UICanvasItemBase> m_pCanvasItemBase;
 
+    // 节点复制相关
+    QString m_cCopyString;
+
 signals:
     void addedNode(int type, const QString& nodeName);
     void deletedNode(int type, const QString& nodeName);
     void changeNodeName(int type, const QString& srcName, const QString& destName);
+
+private slots:
+    void onAttributeValueChanged(NDAttributeBase* pAttribute, const QVariant& value, bool cmd);
 };
 
 #endif

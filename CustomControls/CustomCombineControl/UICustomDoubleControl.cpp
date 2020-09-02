@@ -62,6 +62,8 @@ void UICustomDoubleControl::setRangeValue(qreal minValue, qreal maxValue)
 
 void UICustomDoubleControl::onSliderPressed(void)
 {
+    m_beforeValue = m_pDoubleSpinBox->value();
+
     qreal valus = getValuesBySlider();
     m_pDoubleSpinBox->setValue(valus);
 
@@ -81,7 +83,8 @@ void UICustomDoubleControl::onSliderReleased(void)
     qreal valus = getValuesBySlider();
     m_pDoubleSpinBox->setValue(valus);
 
-    emit valueChanged(valus);
+    emit valueChanged(m_beforeValue);
+    emit valueChanged(valus, true);
 }
 
 void UICustomDoubleControl::onSliderValueChanged(int value)
@@ -107,5 +110,5 @@ void UICustomDoubleControl::onDoubleValueChanged(void)
     m_pSlider->setValue(val);
     m_pSlider->blockSignals(false);
 
-    emit valueChanged(value);
+    emit valueChanged(value, true);
 }

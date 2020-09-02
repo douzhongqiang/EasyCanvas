@@ -31,7 +31,7 @@ private:
     bool showFileBrowseDialo(QString& str);
 
 private slots:
-    void onAttributeValueChanged(const QString& value);
+    void onAttributeValueChanged(const QVariant& value);
 };
 
 #endif

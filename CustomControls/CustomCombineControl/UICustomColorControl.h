@@ -22,7 +22,7 @@ public:
     ~UICustomColorControl();
 
     // 设置/获取当前的颜色值
-    void setCurrentColor(const QColor& color);
+    void setCurrentColor(const QColor& color, bool cmd = false);
     const QColor& getCurrentColor(void);
 
 private:
@@ -31,8 +31,10 @@ private:
     // 滑条
     QSlider* m_pSlider = nullptr;
 
+    QColor m_tempColor;
+
     // 设置颜色
-    void setColorByVValue(int vValue);
+    void setColorByVValue(int vValue, bool cmd = false);
 
 private slots:
     void onSliderMoved(void);
@@ -44,9 +46,9 @@ private slots:
 
 signals:
     // 颜色更改发送信号（滑杆松开后发送该信号、通过点击更改颜色）
-    void colorChanged(const QColor& color);
+    void colorChanged(const QColor& color, bool cmd = false);
     // 颜色更改信号（滑动滑杆就触发）
-    void colorDragChanged(const QColor& color);
+    void colorDragChanged(const QColor& color, bool cmd = false);
 };
 
 #endif

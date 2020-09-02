@@ -14,16 +14,6 @@ public:
     AttributeType Type(void) const override{
         return t_bool;
     }
-
-    // 设置/获取当前值
-    void setCurrentValue(bool value);
-    bool getCurrentValue(void);
-
-private:
-    bool m_value = true;
-
-signals:
-    void valueChanged(bool value);
 };
 
 #endif

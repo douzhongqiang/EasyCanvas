@@ -1,6 +1,8 @@
 #include "UINodeTreeViewModel.h"
 #include "UINodeItem.h"
 #include "UICanvas/UICanvasItemManager.h"
+#include "UINodeTreeView.h"
+#include <QtDebug>
 
 UINodeTreeViewModel::UINodeTreeViewModel(QObject* parent)
     :QAbstractItemModel(parent)
@@ -128,7 +130,7 @@ void UINodeTreeViewModel::updateAllNodes(void)
 }
 
 // 设置当前的TreeView
-void UINodeTreeViewModel::setCurrentTreeView(QTreeView* pTreeView)
+void UINodeTreeViewModel::setCurrentTreeView(UINodeTreeView* pTreeView)
 {
     m_pTreeView = pTreeView;
 }
@@ -164,6 +166,12 @@ QModelIndex UINodeTreeViewModel::getIndexByName(const QString nodeName)
     return QModelIndex();
 }
 
+void UINodeTreeViewModel::refrush(void)
+{
+    this->beginResetModel();
+    this->endResetModel();
+}
+
 bool UINodeTreeViewModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || role != Qt::EditRole)
@@ -171,11 +179,15 @@ bool UINodeTreeViewModel::setData(const QModelIndex &index, const QVariant &valu
 
     UINodeItem* pNode = static_cast<UINodeItem*>(index.internalPointer());
     QString nodeName = pNode->getName();
-    if (m_pCanvasItemData->isCanChangedName(nodeName, value.toString()))
+    bool result = m_pCanvasItemData->isCanChangedName(nodeName, value.toString());
+    if (result)
     {
         m_pCanvasItemData->changedNodeNameCmd(nodeName, value.toString());
         pNode->setName(value.toString());
         return true;
+    }
+    else {
+        qDebug() << "Has Finded Node " << nodeName;
     }
 
     return false;
@@ -195,7 +207,7 @@ void UINodeTreeViewModel::onAddedNodeItem(int nodeType, const QString& name)
     node->appendChildNode(childNode);
 
     // 更新显示
-    m_pTreeView->doItemsLayout();
+    m_pTreeView->updateView();
 }
 
 void UINodeTreeViewModel::onDeleteNodeItem(int nodeType, const QString& name)
@@ -209,7 +221,7 @@ void UINodeTreeViewModel::onDeleteNodeItem(int nodeType, const QString& name)
 
     // 更新显示
     m_pTreeView->clearSelection();
-    m_pTreeView->doItemsLayout();
+    m_pTreeView->updateView();
 }
 
 void UINodeTreeViewModel::onChangeNodeItemName(int nodeType, const QString& srcName, const QString& destName)

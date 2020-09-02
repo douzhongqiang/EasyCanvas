@@ -21,9 +21,9 @@ private:
 
 private slots:
     // 属性值发生改变同步控件
-    void onColorValueChanged(const QColor& value);
+    void onColorValueChanged(const QVariant& value);
     // 控件值发生改变同步属性
-    void onControlValuedChanged(const QColor& color);
+    void onControlValuedChanged(const QColor& color, bool cmd = false);
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include "SQLCore.h"
 #include "UICanvas/UICanvasItemManager.h"
 #include "UICanvas/UICanvasView.h"
+#include <QDebug>
 
 CanvasSchemeManager* CanvasSchemeManager::getInstance(void)
 {
@@ -80,6 +81,11 @@ void CanvasSchemeManager::saveScheme(void)
         image = converToSamllImage(image);
         info.image = image;
 
+        m_schemeInfos.erase(iter);
+        m_schemeInfos.insert(info);
+//        qDebug() << info.editTime.toString("yyyy-MM-dd hh:mm:ss");
+//        qDebug() << m_schemeInfos.begin()->editTime.toString("yyyy-MM-dd hh:mm:ss");
+
         // 更改数据库方案
         m_pSQLCore->editSchemeInfo(info.schemeName, info);
     }
@@ -120,9 +126,11 @@ void CanvasSchemeManager::changedSchemeName(const QString& name, const QString& 
     tempInfo.schemeName = destName;
     m_schemeInfos.erase(iter);
     m_schemeInfos.insert(tempInfo);
+
+    m_pSQLCore->changedSchemeName(name, destName);
 }
 
-QSet<SchemeDataInfo::SchemeInfo> CanvasSchemeManager::getSchemeInfoList(void)
+std::set<SchemeDataInfo::SchemeInfo> CanvasSchemeManager::getSchemeInfoList(void)
 {
     return m_schemeInfos;
 }

@@ -42,6 +42,7 @@ void UICustomIntControl::setRangeValue(int minValue, int maxValue)
     m_pIntValue->setMaximum(m_nMaxValue);
 }
 
+
 void UICustomIntControl::setCurrentValue(int value)
 {
     if (value < m_nMinValue || value > m_nMaxValue)
@@ -69,7 +70,7 @@ int UICustomIntControl::getValuesBySlider(void)
 
 void UICustomIntControl::onSliderPressed(void)
 {
-    qDebug() << __FUNCTION__ << ", " << m_pSlider->value();
+    m_tempValue = m_pIntValue->value();
 
     int value = getValuesBySlider();
     m_pIntValue->setValue(value);
@@ -79,8 +80,6 @@ void UICustomIntControl::onSliderPressed(void)
 
 void UICustomIntControl::onSliderMoved(void)
 {
-    qDebug() << __FUNCTION__ << ", " << m_pSlider->value();
-
     int value = getValuesBySlider();
     m_pIntValue->setValue(value);
 
@@ -89,12 +88,11 @@ void UICustomIntControl::onSliderMoved(void)
 
 void UICustomIntControl::onSliderReleased(void)
 {
-    qDebug() << __FUNCTION__ << ", " << m_pSlider->value();
-
     int value = getValuesBySlider();
     m_pIntValue->setValue(value);
 
-    emit valueChanged(value);
+    emit valueChanged(m_tempValue);
+    emit valueChanged(value, true);
 }
 
 void UICustomIntControl::onSliderValueChanged(int val)
@@ -112,5 +110,5 @@ void UICustomIntControl::onIntValueChanged(void)
     m_pSlider->setValue(value * 1.0 / (m_nMaxValue - m_nMinValue) * 100);
     m_pSlider->blockSignals(false);
 
-    emit valueChanged(value);
+    emit valueChanged(value, true);
 }

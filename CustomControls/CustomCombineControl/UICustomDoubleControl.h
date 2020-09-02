@@ -34,6 +34,7 @@ private:
     UICustomDoubleSpinBox* m_pDoubleSpinBox = nullptr;
     QSlider* m_pSlider = nullptr;
 
+    qreal m_beforeValue = 0;
     qreal m_qMaxValue = 0;
     qreal m_qMinValue = 1;
 
@@ -48,7 +49,7 @@ private slots:
     void onDoubleValueChanged(void);
 
 signals:
-    void valueChanged(qreal);
+    void valueChanged(qreal value, bool cmd = false);
 };
 
 #endif

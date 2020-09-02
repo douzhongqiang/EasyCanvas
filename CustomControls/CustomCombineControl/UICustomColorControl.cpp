@@ -32,7 +32,7 @@ UICustomColorControl::~UICustomColorControl()
 
 }
 
-void UICustomColorControl::setCurrentColor(const QColor& color)
+void UICustomColorControl::setCurrentColor(const QColor& color, bool cmd)
 {
     if (color == m_pColorViewWidget->getCurrentColor())
         return;
@@ -46,7 +46,7 @@ void UICustomColorControl::setCurrentColor(const QColor& color)
     m_pSlider->blockSignals(false);
 
     // 发送颜色更改信号
-    emit colorChanged(color);
+    emit colorChanged(color, cmd);
 }
 
 const QColor& UICustomColorControl::getCurrentColor(void)
@@ -59,7 +59,7 @@ void UICustomColorControl::onSliderMoved(void)
     setColorByVValue(m_pSlider->value());
 }
 
-void UICustomColorControl::setColorByVValue(int vValue)
+void UICustomColorControl::setColorByVValue(int vValue, bool cmd)
 {
     QColor color = m_pColorViewWidget->getCurrentColor();
 
@@ -67,21 +67,29 @@ void UICustomColorControl::setColorByVValue(int vValue)
     color.getHsv(&h, &s, &v);
     color.setHsv(h, s, vValue);
 
-    if (color != m_pColorViewWidget->getCurrentColor())
+    if (color != m_pColorViewWidget->getCurrentColor() || cmd)
     {
         m_pColorViewWidget->setCurrentColor(color);
-        emit colorDragChanged(color);
+        emit colorDragChanged(color, cmd);
     }
 }
 
 void UICustomColorControl::onSliderPressed(void)
 {
+    m_tempColor = m_pColorViewWidget->getCurrentColor();
     setColorByVValue(m_pSlider->value());
 }
 
 void UICustomColorControl::onSliderReleased(void)
 {
-    setColorByVValue(m_pSlider->value());
+    int value = m_pSlider->value();
+
+    setCurrentColor(m_tempColor);
+    setColorByVValue(value, true);
+
+    m_pSlider->blockSignals(true);
+    m_pSlider->setValue(value);
+    m_pSlider->blockSignals(false);
 }
 
 void UICustomColorControl::onSliderValueChanged(int value)
@@ -97,5 +105,5 @@ void UICustomColorControl::onColorViewClicked(void)
         return;
 
     QColor color = dialog.getCurrentColor();
-    this->setCurrentColor(color);
+    this->setCurrentColor(color, true);
 }

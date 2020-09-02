@@ -10,6 +10,18 @@ QWidget[LightStyleProperty='DefaultWidget']
     background-color: rgb(80, 80, 80);
 }
 
+/*有底线的Widget*/
+QWidget[LightStyleProperty='BottomLineWidget']
+{
+    border-bottom: 1px solid rgb(200, 200, 200);
+}
+
+/*透明的Widget*/
+QWidget[LightStyleProperty='TransparentBgWidget']
+{
+    background: transparent;
+}
+
 QMessageBox QWidget
 {
     color: rgb(0, 0, 0);
@@ -260,6 +272,7 @@ QLineEdit, QTextEdit, QTimeEdit, QDateEdit, QDateTimeEdit, QDoubleSpinBox, QSpin
     border-radius: 4px;
     selection-background-color: rgb(130, 130, 130);
     min-height: 20px;
+    padding: 2px;
 }
 
 QLineEdit:focus, QTextEdit:focus, QTimeEdit:focus, QDateEdit:focus, QDateTimeEdit:focus, QDoubleSpinBox:focus, QSpinBox:focus

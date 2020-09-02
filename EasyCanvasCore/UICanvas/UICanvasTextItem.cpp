@@ -29,7 +29,7 @@ void UICanvasTextItem::setCurrentText(const QString& text)
     m_cText = text;
 
     QObject::disconnect(m_pTextValueAttribute, &NDStringAttribute::valueChanged, this, &UICanvasTextItem::onTextValueChanged);
-    m_pTextValueAttribute->setCurrentValue(m_cText);
+    m_pTextValueAttribute->setValue(m_cText);
     QObject::connect(m_pTextValueAttribute, &NDStringAttribute::valueChanged, this, &UICanvasTextItem::onTextValueChanged);
 
     QFontMetrics fm(m_font);
@@ -64,19 +64,19 @@ void UICanvasTextItem::customPaint(QPainter *painter, const QStyleOptionGraphics
 
     // 添加轮廓
     QPen pen;
-    pen.setWidth(m_pOutLineWidthAttribute->getCurrentValue());
-    pen.setColor(m_pOutLineColorAttribute->getCurrentValue());
-    if (m_pBOutLineAttribute->getCurrentValue())
+    pen.setWidth(m_pOutLineWidthAttribute->getValue().toInt());
+    pen.setColor(m_pOutLineColorAttribute->getValue().value<QColor>());
+    if (m_pBOutLineAttribute->getValue().toBool())
         painter->strokePath(path, pen);
 
     // 绘制
-    pen.setWidth(m_pPenSizeAttribute->getCurrentValue());
-    pen.setColor(m_pTtextColorAttribute->getCurrentValue());
+    pen.setWidth(m_pPenSizeAttribute->getValue().toInt());
+    pen.setColor(m_pTtextColorAttribute->getValue().value<QColor>());
     painter->setPen(pen);
-    if (!m_pBFillColorAttribute->getCurrentValue())
+    if (!m_pBFillColorAttribute->getValue().toBool())
         painter->setBrush(Qt::NoBrush);
     else
-        painter->setBrush(m_pFillColorAttribute->getCurrentValue());
+        painter->setBrush(m_pFillColorAttribute->getValue().value<QColor>());
     painter->drawPath(path);
 
     painter->restore();
@@ -89,7 +89,7 @@ void UICanvasTextItem::initAttribute(void)
 
     // 本文内容
     m_pTextValueAttribute = new NDStringAttribute;
-    m_pTextValueAttribute->setCurrentValue(m_cText);
+    m_pTextValueAttribute->setValue(m_cText);
     m_pTextValueAttribute->setDisplayName(tr("Text: "));
     m_pTextValueAttribute->setName("text");
     m_pTextValueAttribute->setShowButton(false);
@@ -97,7 +97,7 @@ void UICanvasTextItem::initAttribute(void)
 
     // 字体大小
     m_pFontSizeAttribute = new NDIntAttribute;
-    m_pFontSizeAttribute->setCurrentValue(m_font.pixelSize());
+    m_pFontSizeAttribute->setValue(m_font.pixelSize());
     m_pFontSizeAttribute->setValueRange(1, 200);
     m_pFontSizeAttribute->setDisplayName(tr("Font Size: "));
     m_pFontSizeAttribute->setName("fontSize");
@@ -105,7 +105,7 @@ void UICanvasTextItem::initAttribute(void)
 
     // 画笔大小
     m_pPenSizeAttribute = new NDIntAttribute;
-    m_pPenSizeAttribute->setCurrentValue(1);
+    m_pPenSizeAttribute->setValue(1);
     m_pPenSizeAttribute->setValueRange(1, 10);
     m_pPenSizeAttribute->setDisplayName(tr("Pen Size: "));
     m_pPenSizeAttribute->setName("penSize");
@@ -113,21 +113,21 @@ void UICanvasTextItem::initAttribute(void)
 
     // 文字颜色
     m_pTtextColorAttribute = new NDColorAttribute;
-    m_pTtextColorAttribute->setCurrentValue(QColor(10, 10, 10));
+    m_pTtextColorAttribute->setValue(QColor(10, 10, 10));
     m_pTtextColorAttribute->setDisplayName(tr("Text Color: "));
     m_pTtextColorAttribute->setName("textColor");
     m_pNode->addAttribute(groupName, m_pTtextColorAttribute);
 
     // 是否填充颜色
     m_pBFillColorAttribute = new NDBoolAttribute;
-    m_pBFillColorAttribute->setCurrentValue(true);
+    m_pBFillColorAttribute->setValue(true);
     m_pBFillColorAttribute->setDisplayName(tr("Is Fill Color: "));
     m_pBFillColorAttribute->setName("bFillColorOutline");
     m_pNode->addAttribute(groupName, m_pBFillColorAttribute);
 
     // 文字填充颜色
     m_pFillColorAttribute = new NDColorAttribute;
-    m_pFillColorAttribute->setCurrentValue(QColor(10, 10, 10));
+    m_pFillColorAttribute->setValue(QColor(10, 10, 10));
     m_pFillColorAttribute->setDisplayName(tr("Fill Color: "));
     m_pFillColorAttribute->setName("fillColor");
     m_pNode->addAttribute(groupName, m_pFillColorAttribute);
@@ -136,7 +136,7 @@ void UICanvasTextItem::initAttribute(void)
     m_pNode->addAttributeGroup(outLineGroupName);
     // 是否显示轮廓线
     m_pBOutLineAttribute = new NDBoolAttribute;
-    m_pBOutLineAttribute->setCurrentValue(false);
+    m_pBOutLineAttribute->setValue(false);
     m_pBOutLineAttribute->setDisplayName(tr("Is Show Outline: "));
     m_pBOutLineAttribute->setName("bShowOutline");
     m_pNode->addAttribute(outLineGroupName, m_pBOutLineAttribute);
@@ -144,14 +144,14 @@ void UICanvasTextItem::initAttribute(void)
     // 添加填充颜色
     m_pOutLineColorAttribute = new NDColorAttribute;
     m_pOutLineColorAttribute->setEnable(false);
-    m_pOutLineColorAttribute->setCurrentValue(QColor(200, 200, 200));
+    m_pOutLineColorAttribute->setValue(QColor(200, 200, 200));
     m_pOutLineColorAttribute->setDisplayName(tr("Outline Color: "));
     m_pOutLineColorAttribute->setName("outlineColor");
     m_pNode->addAttribute(outLineGroupName, m_pOutLineColorAttribute);
 
     // 轮廓线宽度
     m_pOutLineWidthAttribute = new NDIntAttribute;
-    m_pOutLineWidthAttribute->setCurrentValue(1);
+    m_pOutLineWidthAttribute->setValue(1);
     m_pOutLineWidthAttribute->setValueRange(1, 20);
     m_pOutLineWidthAttribute->setDisplayName(tr("OutLine Width: "));
     m_pOutLineWidthAttribute->setName("outlineWidth");
@@ -175,15 +175,15 @@ void UICanvasTextItem::onValueChanged(void)
     this->update();
 }
 
-void UICanvasTextItem::onTextValueChanged(const QString& text)
+void UICanvasTextItem::onTextValueChanged(const QVariant& text)
 {
-    setCurrentText(text);
+    setCurrentText(text.toString());
     this->update();
 }
 
-void UICanvasTextItem::onFontSizeValueChanged(int fontSize)
+void UICanvasTextItem::onFontSizeValueChanged(const QVariant& fontSize)
 {
-    m_font.setPixelSize(fontSize);
+    m_font.setPixelSize(fontSize.toInt());
     setCurrentFont(m_font);
     this->update();
 }

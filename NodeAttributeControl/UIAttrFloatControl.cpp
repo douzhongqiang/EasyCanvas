@@ -33,18 +33,18 @@ void UIAttrFloatControl::setAttribute(NDAttributeBase* attribute)
     this->setRangeValue(startValue, endValue);
 
     // 设置值
-    this->setCurrentValue(m_attribute->getCurrentValue());
+    this->setCurrentValue(m_attribute->getValue().toDouble());
     this->setTagText(m_attribute->getDisplayName());
 }
 
-void UIAttrFloatControl::onValueChanged(qreal value)
+void UIAttrFloatControl::onValueChanged(const QVariant& value)
 {
-    this->setCurrentValue(value);
+    this->setCurrentValue(value.toDouble());
 }
 
-void UIAttrFloatControl::onControlValueChanged(qreal value)
+void UIAttrFloatControl::onControlValueChanged(qreal value, bool cmd)
 {
     QObject::disconnect(m_attribute, &NDRealAttribute::valueChanged, this, &UIAttrFloatControl::onValueChanged);
-    m_attribute->setCurrentValue(value);
+    m_attribute->setValue(value, cmd);
     QObject::connect(m_attribute, &NDRealAttribute::valueChanged, this, &UIAttrFloatControl::onValueChanged);
 }

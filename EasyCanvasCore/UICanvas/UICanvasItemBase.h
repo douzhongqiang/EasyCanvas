@@ -5,12 +5,14 @@
 #include <QGraphicsItem>
 #include <QPixmap>
 #include <QGraphicsObject>
+#include <QJsonObject>
+#include "easycanvascore_global.h"
 
 class NDNodeBase;
 class NDAttributeBase;
 class NDRealAttribute;
 class NDIntAttribute;
-class UICanvasItemBase : public QObject, public QGraphicsItem
+class EASYCANVASCORESHARED_EXPORT UICanvasItemBase : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 
@@ -29,15 +31,20 @@ public:
     // 获取当前的节点
     NDNodeBase* getCurrentNode(void) const;
 
-    // 拷贝另一元素到自身数据中
-    virtual void copyFromItem(UICanvasItemBase* pItem);
-
     // 设置改变大小相关属性
     void setItemResizeable(bool resizeable);
     void setItemResizeRatio(bool resizeRation, qreal rationValue);
 
     // 更新属性显示
     virtual void updateAttribute(void);
+
+    // 获取当前属性Json
+    virtual QJsonObject getStoreJson(int interval = 0);
+    virtual void fillJsonInfo(const QJsonObject& jsonObject);
+
+    // 设置/获取当前索引
+    void setCurrentIndex(int index);
+    int getCurrentIndex(void);
 
 private:
     // 初始化Icon
@@ -55,6 +62,8 @@ private:
     bool m_isResizeable = true;
     bool m_isRatioScale = true;
     qreal m_ratioValue = 1.0;
+
+    int m_nIndex = 0;
 
 protected:
     QRectF boundingRect() const override;
@@ -92,12 +101,12 @@ protected:
     NDRealAttribute* m_pRotateAttribute = nullptr;
 
 private slots:
-    void onXPostionAttributeValueChanged(qreal value);
-    void onYPostionAttributeValueChanged(qreal value);
-    void onZPostionAttributeValueChanged(qreal value);
-    void onWidthAttributeValueChanged(int value);
-    void onHeightAttributeValueChanged(int value);
-    void onRotateAttributeValueChanged(qreal value);
+    void onXPostionAttributeValueChanged(const QVariant& value);
+    void onYPostionAttributeValueChanged(const QVariant& value);
+    void onZPostionAttributeValueChanged(const QVariant& value);
+    void onWidthAttributeValueChanged(const QVariant& value);
+    void onHeightAttributeValueChanged(const QVariant& value);
+    void onRotateAttributeValueChanged(const QVariant& value);
 
 protected:
     // 处理Item上的类型
@@ -105,11 +114,18 @@ protected:
     virtual void mouseMoveResizeOperator(const QPointF& scenePos, const QPointF& loacalPos);
     virtual void mouseMoveRotateOperator(const QPointF& scenePos, const QPointF& loacalPos);
 
+    // 处理鼠标释放
+    virtual void mouseReleaseMoveOperator(const QPointF& scenePos, const QPointF& loacalPos);
+    virtual void mouseReleaseResizeOperator(const QPointF& scenePos, const QPointF& loacalPos);
+    virtual void mouseReleaseRotateOperator(const QPointF& scenePos, const QPointF& loacalPos);
+
     QPointF m_pos;              // 本地所坐标点击的点
     QPointF m_pressedPos;       // 场景坐标点击的点
     QPointF m_startPos;         // Item再场景坐标的起始坐标
     QTransform m_transform;     // 变换矩阵
+    qreal m_startRotate = 0.0;  // 起始旋转角度
     qreal m_rotate = 0.0;       // 当前旋转角度
+    QSize m_startSize;          // 起始矩形
 
 private:
     int m_nInterval = 20;

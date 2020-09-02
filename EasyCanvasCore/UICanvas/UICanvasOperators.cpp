@@ -68,6 +68,19 @@ bool UICanvasDefaultOper::disposePressEvent(QMouseEvent* event)
 
     if (selectedItems.size() > 1 && items.size() > 0)
     {
+        // 查找选择的列表中，是够包含选中的
+        bool hasSelected = false;
+        foreach (auto item, items)
+        {
+            if (item->isSelected())
+            {
+                hasSelected = true;
+                break;
+            }
+        }
+        if (!hasSelected)
+            return true;
+
         // 设置为多选移动操作器(选中的个数>1 且 当前鼠标下有Item时)
         UICanvasMoveSelectedItem* moveSelectOper = new UICanvasMoveSelectedItem(m_pCanvasView);
         m_pCanvasView->setCurrentOperator(moveSelectOper);
@@ -127,6 +140,8 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
     {
         // 方向键 上和下 微调
         auto selectedItems = m_pCanvasView->scene()->selectedItems();
+        QList<NDAttributeBase*> m_attrList;
+        QVector<QVariant> m_values;
         for (auto item : selectedItems)
         {
             UICanvasItemBase* canvasItem = dynamic_cast<UICanvasItemBase*>(item);
@@ -139,18 +154,24 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
                 continue;
 
             // 重新设置属性
-            qreal yPt = pYPtAttr->getCurrentValue();
+            qreal yPt = pYPtAttr->getValue().toDouble();
             if (event->key() == Qt::Key_Up)
                 yPt -= 2;
             else
                 yPt += 2;
-            pYPtAttr->setCurrentValue(yPt);
+
+            m_attrList << pAttr;
+            m_values << yPt;
         }
+
+        g_currentCanvasManager->changedAttributeValues(m_attrList, m_values, true);
     }
     else if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)
     {
         // 方向键 左和右 微调
         auto selectedItems = m_pCanvasView->scene()->selectedItems();
+        QList<NDAttributeBase*> m_attrList;
+        QVector<QVariant> m_values;
         for (auto item : selectedItems)
         {
             UICanvasItemBase* canvasItem = dynamic_cast<UICanvasItemBase*>(item);
@@ -163,23 +184,27 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
                 continue;
 
             // 重新设置属性
-            qreal xPt = pXPtAttr->getCurrentValue();
+            qreal xPt = pXPtAttr->getValue().toDouble();
             if (event->key() == Qt::Key_Left)
                 xPt -= 2;
             else
                 xPt += 2;
-            pXPtAttr->setCurrentValue(xPt);
+
+            m_attrList << pAttr;
+            m_values << xPt;
         }
+
+        g_currentCanvasManager->changedAttributeValues(m_attrList, m_values, true);
     }
-    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_Z)
+    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_C)
     {
-        // Ctrl+Z 撤销
-        g_currentCanvasManager->undo();
+        // 复制
+        g_currentCanvasManager->copySelectNodes();
     }
-    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_Y)
+    else if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_V)
     {
-        // Ctrl+Y 重做
-        g_currentCanvasManager->redo();
+        // 粘贴
+        g_currentCanvasManager->pasteCmd();
     }
 
     return false;
@@ -190,9 +215,11 @@ bool UICanvasDefaultOper::disposeKeyPressEvent(QKeyEvent* event)
 UICanvasPenOper::UICanvasPenOper(UICanvasView* view)
     :UICanvasOperBase(view)
 {
-    auto item = g_currentCanvasManager->createCanvasItem(UICanvasItemManager::t_PathItem);
+    auto item = g_currentCanvasManager->createCanvasItemByCmd(UICanvasItemManager::t_PathItem);
     m_pPathItem = dynamic_cast<UICanvasPathItem*>(item.data());
-    view->scene()->addItem(m_pPathItem);
+
+    m_pPathItem->setPos(0, 0);
+    m_pPathItem->setSelected(false);
 }
 
 UICanvasPenOper::~UICanvasPenOper()
@@ -302,6 +329,21 @@ bool UICanvasMoveSelectedItem::disposePressEvent(QMouseEvent* event)
     m_items = m_pCanvasView->scene()->selectedItems();
     m_scenePos = m_pCanvasView->mapToScene(event->pos());
 
+    foreach (auto item, m_items)
+    {
+        UICanvasItemBase* pItem = qgraphicsitem_cast<UICanvasItemBase*>(item);
+        NDAttributeBase* pXAttr = pItem->getCurrentNode()->getAttribute("xPt");
+        NDAttributeBase* pYAttr = pItem->getCurrentNode()->getAttribute("yPt");
+
+        m_xAttributes << pXAttr;
+        m_yAttributes << pYAttr;
+
+        m_xValues << pXAttr->getValue();
+        m_yValues << pYAttr->getValue();
+    }
+
+    m_xOldValues = m_xValues;
+    m_yOldValues = m_yValues;
     return UICanvasOperBase::disposePressEvent(event);
 }
 
@@ -313,6 +355,7 @@ bool UICanvasMoveSelectedItem::disposeMoveEvent(QMouseEvent* event)
     m_scenePos = pos;
 
     // 重新设置全部选中的坐标
+    int count = 0;
     foreach (auto item, m_items)
     {
         QPointF itemPos = item->pos();
@@ -320,6 +363,9 @@ bool UICanvasMoveSelectedItem::disposeMoveEvent(QMouseEvent* event)
         itemPos.setY(itemPos.y() + yIntervalue);
 
         item->setPos(itemPos);
+
+        m_xValues[count] = itemPos.x();
+        m_yValues[count++] = itemPos.y();
     }
 
     return UICanvasOperBase::disposeMoveEvent(event);
@@ -327,5 +373,10 @@ bool UICanvasMoveSelectedItem::disposeMoveEvent(QMouseEvent* event)
 
 bool UICanvasMoveSelectedItem::disposeReleaseEvent(QMouseEvent* event)
 {
+    g_currentCanvasManager->changedAttributeValues(m_xAttributes + m_yAttributes, \
+                                                   m_xOldValues + m_yOldValues);
+    g_currentCanvasManager->changedAttributeValues(m_xAttributes + m_yAttributes, \
+                                                   m_xValues + m_yValues, true);
+
     return UICanvasOperBase::disposeReleaseEvent(event);
 }

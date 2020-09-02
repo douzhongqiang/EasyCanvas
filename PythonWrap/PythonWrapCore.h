@@ -2,6 +2,7 @@
 #define PYTHONWRAPCORE_H
 
 #include <QObject>
+#include <QWidget>
 #include "pythonwrap_global.h"
 #include "PythonQt.h"
 #include "PythonQt_QtAll.h"
@@ -25,15 +26,35 @@ public:
     void setSceneNode(NDNodeBase* sceneNode);
 
     // 显示脚本控制台
-    void showScriptingConsole(void);
+    QWidget* getScriptConsole(void);
+    // 添加控制台输出
+    void writeConsoleOutPut(const QString& message);
+
+    // 执行文件
+    void runScriptFiles(const QString& fileName);
 
 public:
     // 下面是主要针对python的接口
     // 改变属性值
     Q_INVOKABLE void setAttribute(const QString& attributeName, const QVariant& var);
-
-    Q_INVOKABLE void createNode(const QString& typeName);
+    // 添加和删除节点
+    Q_INVOKABLE QString createNode(const QString& typeName);
     Q_INVOKABLE void deleteNode(const QString& nodeName);
+    // 修改节点的名字
+    Q_INVOKABLE void changeNodeName(const QString& srcName, const QString& destName);
+
+    // 获取节点名等
+    Q_INVOKABLE QStringList getAllNodes(void);
+    // 获取选择的节点名
+    Q_INVOKABLE QStringList getSelectedNodes(void);
+    // 获取节点类型
+    Q_INVOKABLE QString getNodeType(const QString& nodeName);
+    // 获取属性列表
+    Q_INVOKABLE QStringList getAttributeNames(const QString& nodeName);
+    // 获取属性值
+    Q_INVOKABLE QVariant getValue(const QString& attributeName);
+    // 获取属性的类型
+    Q_INVOKABLE QString getAttributeType(const QString& attributeName);
 
 private:
     PythonWrapCore(QObject* parent = nullptr);

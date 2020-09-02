@@ -3,8 +3,11 @@
 
 #include <QObject>
 #include <QUndoStack>
+#include <QUndoView>
+#include "easycanvascore_global.h"
 
-class UndoCmdCore : public QObject
+class NDAttributeBase;
+class EASYCANVASCORESHARED_EXPORT UndoCmdCore : public QObject
 {
     Q_OBJECT
 
@@ -14,7 +17,8 @@ public:
         t_createCmd,
         t_deleteCmd,
         t_renameCmd,
-        t_changedAttrCmd
+        t_changedAttrCmd,
+        t_pasteCmd
     };
 
 public:
@@ -28,10 +32,25 @@ public:
     // 添加 改变名字命令
     void runChangeNameCmd(const QString& nodeName, const QString& destNodeName);
     // 添加 改变属性命令
-    void runChangedAttrCmd(const QString& attrFullName, const QVariant& value);
+    void runChangedAttrCmd(const QString& attrFullName, const QVariant& value, bool isCanrun = false);
+    void runChangedAttrCmd(const QList<NDAttributeBase*>& attrList, const QVariant& value, bool isCanrun = false);
+    void runChangedAttrCmd(const QList<NDAttributeBase*>& attrList, const QVector<QVariant>& values, bool isCanrun = false);
+    // 粘贴命令
+    void runPasteCmd(void);
 
     void redo(void);
     void undo(void);
+
+    // 创建Redo/Undo Action
+    QAction* createRedoAction(void);
+    QAction* createUndoAction(void);
+
+    // 创建Redo/Undo View
+    QUndoView* createUndoView(void);
+
+    // Undo栈相关
+    bool isUndoStackEmpty(void);
+    void cleanUndoStack(void);
 
 private:
     QUndoStack* m_pUndoStack = nullptr;
