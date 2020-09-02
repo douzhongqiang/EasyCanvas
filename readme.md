@@ -1,10 +1,14 @@
 基于Qt QGraphicsView的简单作图软件
 
-软件绿色版下载地址：
+软件绿色版（旧版本）下载地址：
 
 链接：https://pan.baidu.com/s/1r2zKmt4ID_7p0V8Fm7e7cQ 提取码：m6n1
 
 视频演示地址：https://www.bilibili.com/video/BV18K411L7Ca/
+
+**新版本 V2.0下载地址：**
+
+链接：https://pan.baidu.com/s/1WahxhWbh74wBNFH-z0XF_g  提取码：c84n
 
 **注意：** 
 
