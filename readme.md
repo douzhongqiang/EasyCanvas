@@ -8,7 +8,7 @@
 
 **新版本 V2.0下载地址：**
 
-链接：https://pan.baidu.com/s/1WahxhWbh74wBNFH-z0XF_g  提取码：c84n
+链接：https://pan.baidu.com/s/1vEJ1T2txrGtSjlBNHip-tg 提取码：94ds
 
 **注意：** 
 
