@@ -22,6 +22,8 @@
 
 链接：https://pan.baidu.com/s/1qn-L1Vc3cFSUdf8Rx5YLiA   提取码：0rsf
 
+4. 源码中未提供Python库环境，如果运行失败可以安装Python3.8。或者将绿色版的 **Lib** 目录拷贝到生成的程序的可执行文件所在目录。**（PythonQt::Init()）** 程序闪退，可按此步骤解决。
+
 # 1. 基本功能
 
 1. 画布设置，可以修改画布的尺寸、颜色信息
