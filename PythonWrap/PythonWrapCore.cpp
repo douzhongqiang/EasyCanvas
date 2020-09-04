@@ -35,12 +35,16 @@ PythonWrapCore* PythonWrapCore::getInstace(void)
 
 void PythonWrapCore::init(void)
 {
+    qDebug() << "PythonWrap Init";
+
     // init PythonQt and Python
-    PythonQt::init(PythonQt::RedirectStdOut | PythonQt::IgnoreSiteModule | PythonQt::ExternalHelp);
+    PythonQt::init();
     PythonQt_QtAll::init();
 
     m_mainObject = PythonQt::self()->getMainModule();
-    m_mainObject.addObject("easyCanvas", g_PythonWrapCode);
+    if (!m_mainObject.isNull())
+        m_mainObject.addObject("easyCanvas", g_PythonWrapCode);
+    qDebug() << "PythonWrap End";
 }
 
 // 改变属性值

@@ -1,14 +1,15 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    EasyCanvasCore \
-    PythonWrap \
-	Utils \
-    AudioVideoCore \
-    CustomControls \
     CustomWidgets \
+    CustomControls \
     NDNodeAttribute \
     NodeAttributeControl \
-	EasyCanvas
+    Utils \
+    AudioVideoCore \
+    EasyCanvasCore \
+    PythonWrap \
+    EasyCanvas
 
+CONFIG += ordered
 TRANSLATIONS = EasyCanvas_zh_CH.ts

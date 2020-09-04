@@ -4,6 +4,9 @@
 #include <QUndoCommand>
 #include <QVariant>
 #include <QPointer>
+#include <QVector>
+#include <QList>
+
 class NDAttributeBase;
 class ItemAttributeChangedCmd : public QUndoCommand
 {

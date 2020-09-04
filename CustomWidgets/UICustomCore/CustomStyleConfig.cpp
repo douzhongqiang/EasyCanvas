@@ -5,6 +5,7 @@
 #include <QStyle>
 #include <QCoreApplication>
 #include <QTranslator>
+#include <QDebug>
 
 CustomStyleConfig::CustomStyleConfig()
     :m_cNormalBgColor(80, 80, 80)
@@ -31,6 +32,8 @@ CustomStyleConfig* CustomStyleConfig::getInstance(void)
 
 void CustomStyleConfig::init(void)
 {
+    qDebug() << __FUNCTION__;
+
     m_sCurrentPropertyName = "LightStyleProperty";
     QString styleStringPath = ":/qss/light.css";
 
