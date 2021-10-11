@@ -13,6 +13,7 @@
 
 UICanvasView::UICanvasView(QWidget* parent)
     :QGraphicsView(parent)
+    ,m_pCurrentOper(nullptr)
     ,m_cSelectedPenColor(200, 100, 100)
     ,m_cSelectedBrushColor(0, 0, 200, 100)
 {
@@ -39,7 +40,7 @@ UICanvasView::UICanvasView(QWidget* parent)
 
 UICanvasView::~UICanvasView()
 {
-    delete m_pCurrentOper;
+
 }
 
 void UICanvasView::createImageItem(void)
@@ -87,7 +88,7 @@ void UICanvasView::setSelectedRect(const QRect& rect)
 
 void UICanvasView::setCurrentOperator(UICanvasOperBase* canvasOper)
 {
-    m_pCurrentOper = canvasOper;
+    m_pCurrentOper.reset(canvasOper);
 }
 
 void UICanvasView::mousePressEvent(QMouseEvent* event)

@@ -15,6 +15,7 @@
 #include <QSharedPointer>
 #include <QDebug>
 #include <QVariant>
+#include <QFile>
 
 PythonWrapCore::PythonWrapCore(QObject* parent)
     :QObject(parent)

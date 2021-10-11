@@ -1,11 +1,11 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    Utils \
     CustomWidgets \
     CustomControls \
     NDNodeAttribute \
     NodeAttributeControl \
-    Utils \
     AudioVideoCore \
     EasyCanvasCore \
     PythonWrap \

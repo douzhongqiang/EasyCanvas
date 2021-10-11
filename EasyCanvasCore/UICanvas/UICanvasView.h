@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QSharedPointer>
 #include "easycanvascore_global.h"
 
 class UICanvasOperBase;
@@ -82,7 +83,7 @@ private:
     UICanvasScene* m_pScene = nullptr;
 
     UICanvasPathItem* m_pathItem = nullptr;
-    UICanvasOperBase* m_pCurrentOper = nullptr;
+    QSharedPointer<UICanvasOperBase> m_pCurrentOper;
 
     // 选中矩形相关
     bool m_isSelectedRectVisible = false;
