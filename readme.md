@@ -72,7 +72,7 @@
 
 作者： 不会飞的纸飞机
 
-个人博客主页： https://www.douzhq.cn
+个人博客主页： https://www.feijiblog.com
 
 CSDN主页： https://blog.csdn.net/douzhq
 
