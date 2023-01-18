@@ -49,7 +49,7 @@
 
 4. Python命令
 
-   更多命令详见： [ https://www.douzhq.cn/easycanvas_cmd/ ]( https://www.douzhq.cn/easycanvas_cmd/ )
+   更多命令详见： [http://www.feijiblog.com/blog/qteasycanvasv2cmd](http://www.feijiblog.com/blog/qteasycanvasv2cmd)
 
 5. 节点树同步显示节点信息
 6. 撤销/重做功能
