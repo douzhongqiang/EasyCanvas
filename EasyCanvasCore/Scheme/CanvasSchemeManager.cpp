@@ -84,10 +84,10 @@ void CanvasSchemeManager::saveScheme(void)
 
         m_schemeInfos.erase(iter);
         m_schemeInfos.insert(info);
-//        qDebug() << info.editTime.toString("yyyy-MM-dd hh:mm:ss");
-//        qDebug() << m_schemeInfos.begin()->editTime.toString("yyyy-MM-dd hh:mm:ss");
+        //        qDebug() << info.editTime.toString("yyyy-MM-dd hh:mm:ss");
+        //        qDebug() << m_schemeInfos.begin()->editTime.toString("yyyy-MM-dd hh:mm:ss");
 
-        // 更改数据库方案
+                // 更改数据库方案
         m_pSQLCore->editSchemeInfo(info.schemeName, info);
     }
 
@@ -100,7 +100,8 @@ void CanvasSchemeManager::deleteScheme(const QString& schemeName)
 {
     SchemeDataInfo::SchemeInfo tempInfo;
     tempInfo.schemeName = schemeName;
-    auto iter = m_schemeInfos.find(tempInfo);
+
+    auto iter = std::find(m_schemeInfos.begin(), m_schemeInfos.end(), tempInfo);
     if (iter == m_schemeInfos.end())
         return;
 
@@ -119,7 +120,7 @@ void CanvasSchemeManager::changedSchemeName(const QString& name, const QString& 
     // 查找
     SchemeDataInfo::SchemeInfo tempInfo;
     tempInfo.schemeName = name;
-    auto iter = m_schemeInfos.find(tempInfo);
+    auto iter = std::find(m_schemeInfos.begin(), m_schemeInfos.end(), tempInfo);
     if (iter == m_schemeInfos.end())
         return;
 
@@ -140,7 +141,7 @@ std::set<SchemeDataInfo::SchemeInfo> CanvasSchemeManager::getSchemeInfoList(void
 QString CanvasSchemeManager::getSchemeName(int index)
 {
     int count = 0;
-    foreach (auto info, m_schemeInfos)
+    foreach(auto info, m_schemeInfos)
     {
         if (count == index)
             return info.schemeName;
@@ -154,7 +155,7 @@ QString CanvasSchemeManager::getSchemeName(int index)
 SchemeDataInfo::SchemeInfo CanvasSchemeManager::getSchemeInfo(int index)
 {
     int count = 0;
-    foreach (auto info, m_schemeInfos)
+    foreach(auto info, m_schemeInfos)
     {
         if (count == index)
             return info;

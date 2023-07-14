@@ -8,7 +8,7 @@
 #include "MainWindow.h"
 #include "PythonWrapCore.h"
 
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     QString messageString = "%1: %2 (%3:%4, %5)\n";
     QString typeString;
@@ -32,14 +32,14 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
     messageString = messageString.arg(typeString).arg(msg).arg(context.file).arg(context.line).arg(context.function);
 
-    QFile file("./log.txt");
+    QFile file(qApp->applicationDirPath() + QString("/") + "./log.txt");
     file.open(QFile::Append);
     QTextStream stream(&file);
     stream << messageString;
     file.close();
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     //qInstallMessageHandler(myMessageOutput);
     QApplication a(argc, argv);
@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
 
     //  初始化样式和翻译
     g_StyleConfig->init();
-    g_StyleConfig->loadLanguage("./CustomNormalCode_zh_CH.qm");
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    g_StyleConfig->loadLanguage(curAppPath + "./CustomNormalCode_zh_CH.qm");
 
     qDebug() << "Init Pythoning";
     //  初始化Python环境

@@ -4,12 +4,14 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <functional>
+#include <QApplication>
 
 UICanvasImageItem::UICanvasImageItem(QGraphicsItem* parentItem)
     :UICanvasItemBase(parentItem)
 {
     initAttribute();
-    setImage("./t3.jpg");
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    setImage(curAppPath + "./t3.jpg");
 }
 
 UICanvasImageItem::~UICanvasImageItem()
@@ -17,7 +19,7 @@ UICanvasImageItem::~UICanvasImageItem()
 
 }
 
-void UICanvasImageItem::customPaint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void UICanvasImageItem::customPaint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->save();
 
@@ -65,18 +67,19 @@ void UICanvasImageItem::initAttribute(void)
     m_pFilePathAttribute->setShowButton(true);
     m_pFilePathAttribute->setButtonString(tr("Browse"));
     m_pFilePathAttribute->setButtonFunction(std::bind(&UICanvasImageItem::showFileBrowseDialo, \
-                                                      this, std::placeholders::_1));
+        this, std::placeholders::_1));
     m_pNode->addAttribute(attributeGroupName, m_pFilePathAttribute);
 
     // 连接信号和槽函数
     QObject::connect(m_pFilePathAttribute, &NDStringAttribute::valueChanged, \
-                     this, &UICanvasImageItem::onAttributeValueChanged);
+        this, &UICanvasImageItem::onAttributeValueChanged);
 }
 
 bool UICanvasImageItem::showFileBrowseDialo(QString& str)
 {
-    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Image File"), "./", \
-                                 tr("Image Files (*.bmp *.png *.jpg)"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Image File"), curAppPath + "./", \
+        tr("Image Files (*.bmp *.png *.jpg)"));
     if (fileName.isEmpty())
         return false;
 

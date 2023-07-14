@@ -13,6 +13,7 @@
 #include <QJsonDocument>
 #include <QDebug>
 #include <QJsonParseError>
+#include <QApplication>
 #include "NDNodeManager.h"
 
 QVector<UICanvasItemManager*> UICanvasItemManager::m_canvasList;
@@ -30,7 +31,7 @@ UICanvasItemManager::UICanvasItemManager(QObject* parent)
     m_pUndoCmdCore = new UndoCmdCore(this);
 
     QObject::connect(g_nodeManager, &NDNodeManager::signalAttrValueChanged, \
-                     this, &UICanvasItemManager::onAttributeValueChanged);
+        this, &UICanvasItemManager::onAttributeValueChanged);
 }
 
 UICanvasItemManager::~UICanvasItemManager()
@@ -158,20 +159,22 @@ void UICanvasItemManager::fillNodeJsonInfo(NDNodeBase* pNode, const QJsonObject&
 // 获取类别的图标
 QIcon UICanvasItemManager::getTypeIcon(CanvasItemType type)
 {
+    QString curAppPath = qApp->applicationDirPath() + "/";
+
     switch (type)
     {
     case t_RectItem:
-        return QIcon("./images/rectItem.png");
+        return QIcon(curAppPath + "./images/rectItem.png");
     case t_TextItem:
-        return QIcon("./images/textItem.png");
+        return QIcon(curAppPath + "./images/textItem.png");
     case t_EllipseItem:
-        return QIcon("./images/ellipseItem.png");
+        return QIcon(curAppPath + "./images/ellipseItem.png");
     case t_ImageItem:
-        return QIcon("./images/imageItem.png");
+        return QIcon(curAppPath + "./images/imageItem.png");
     case t_PathItem:
-        return QIcon("./images/freeDrawItem.png");
+        return QIcon(curAppPath + "./images/freeDrawItem.png");
     case t_AudioItem:
-        return QIcon("./images/audioItem.png");
+        return QIcon(curAppPath + "./images/audioItem.png");
     default:
         return QIcon();
     }
@@ -234,7 +237,7 @@ QSharedPointer<UICanvasItemBase> UICanvasItemManager::createCanvasItem(CanvasIte
         // 自动生成节点名
         do {
             tempNodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
-        }while(m_nameHash.find(tempNodeName) != m_nameHash.end());
+        } while (m_nameHash.find(tempNodeName) != m_nameHash.end());
     }
 
     // 设置属性名和类型
@@ -267,7 +270,7 @@ void UICanvasItemManager::addCanvasItem(QSharedPointer<UICanvasItemBase> pCanvas
         // 自动生成节点名
         do {
             tempNodeName = QString("%1_%2").arg(getTypeName(type)).arg(m_countMap[type].count++);
-        }while(m_nameHash.find(tempNodeName) != m_nameHash.end());
+        } while (m_nameHash.find(tempNodeName) != m_nameHash.end());
     }
 
     // 设置属性名和类型
@@ -326,7 +329,7 @@ void UICanvasItemManager::deleteCanvasItem(const QString& nodeName)
 
 void UICanvasItemManager::deleteCanvasItems(const QStringList& nodeNames)
 {
-    foreach (const QString& nodeName, nodeNames)
+    foreach(const QString & nodeName, nodeNames)
     {
         deleteCanvasItem(nodeName);
     }
@@ -493,7 +496,7 @@ void UICanvasItemManager::cleanAll(void)
 }
 
 void UICanvasItemManager::changedAttributeValues(const QList<NDAttributeBase*>& attributes, \
-                            const QVector<QVariant>& values, bool isCmd)
+    const QVector<QVariant>& values, bool isCmd)
 {
     if (isCmd)
     {
@@ -512,7 +515,7 @@ void UICanvasItemManager::setSelectedNodes(const QStringList& nodeNames)
 {
     m_pCanvasView->cleanAllSelected();
 
-    foreach(const QString& nodeName, nodeNames)
+    foreach(const QString & nodeName, nodeNames)
     {
         auto iter = m_nameHash.find(nodeName);
         if (iter == m_nameHash.end())

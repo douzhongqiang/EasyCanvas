@@ -17,6 +17,10 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+QMAKE_CXXFLAGS_RELEASE += /Zi
+QMAKE_CXXFLAGS_RELEASE += /Od
+QMAKE_LFLAGS_RELEASE += /DEBUG
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -50,14 +54,26 @@ INCLUDEPATH += $$PWD/UICanvas
 INCLUDEPATH += $$PWD/UICore
 INCLUDEPATH += $$PWD/../thirdLibs/ffmpeg/include
 
-INCLUDEPATH += $$PWD/../thirdLibs/PythonQt/include
-INCLUDEPATH += $$PWD/../thirdLibs/python3_8/include
+#INCLUDEPATH += $$PWD/../thirdLibs/PythonQt/include
+#INCLUDEPATH += $$PWD/../thirdLibs/python3_8/include
+#CONFIG(debug, debug|release) {
+#    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/debug -lPythonQt_QtAll-Qt5-Python38_d -lPythonQt-Qt5-Python38_d
+#    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3_d -lpython38_d
+#} else {
+#    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
+#    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
+#}
+
+INCLUDEPATH += $$PWD/../thirdLibs/PythonQt_3_10/include
+INCLUDEPATH += $$PWD/../thirdLibs/python3_10/include
 CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/debug -lPythonQt_QtAll-Qt5-Python38_d -lPythonQt-Qt5-Python38_d
     LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3_d -lpython38_d
 } else {
-    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
-    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
+    #LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
+    #LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
+    LIBS += -L$$PWD/../thirdLibs/PythonQt_3_10/libs/release -lPythonQt_QtAll-Qt5-Python3.10 -lPythonQt-Qt5-Python3.10
+    LIBS += -L$$PWD/../thirdLibs/python3_10/libs -lpython3 -lpython310
 }
 
 SOURCES += \

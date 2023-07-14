@@ -30,6 +30,10 @@ CONFIG += c++11
 INCLUDEPATH += $$PWD/../thirdLibs/ffmpeg/include
 LIBS += -L$$PWD/../thirdLibs/ffmpeg/libs/ -lavcodec -lavformat -lavutil
 
+QMAKE_CXXFLAGS_RELEASE += /Zi
+QMAKE_CXXFLAGS_RELEASE += /Od
+QMAKE_LFLAGS_RELEASE += /DEBUG
+
 SOURCES += \
         AudioData.cpp \
         AudioDecodec.cpp \

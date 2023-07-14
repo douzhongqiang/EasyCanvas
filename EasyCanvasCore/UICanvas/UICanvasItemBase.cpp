@@ -10,6 +10,7 @@
 #include <cmath>
 #include <math.h>
 #include <QJsonObject>
+#include <QApplication>
 #include "NDNodeBase.h"
 #include "NDAttributeBase.h"
 #include "NDRealAttribute.h"
@@ -24,8 +25,8 @@ QImage UICanvasItemBase::m_rotateIcon;
 
 UICanvasItemBase::UICanvasItemBase(QGraphicsItem* parentItem)
     :QGraphicsItem(parentItem)
-    ,m_cPenColor(255, 0, 0)
-    ,m_cBrushColor(200, 100, 100)
+    , m_cPenColor(255, 0, 0)
+    , m_cBrushColor(200, 100, 100)
 {
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
     this->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
@@ -74,7 +75,7 @@ QRectF UICanvasItemBase::boundingRect() const
     return rectF;
 }
 
-void UICanvasItemBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void UICanvasItemBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -106,22 +107,22 @@ void UICanvasItemBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->drawEllipse(outLintRect.topRight(), m_nEllipseWidth, m_nEllipseWidth);
     if (!m_closePixmap.isNull())
         painter->drawPixmap(QRect(outLintRect.topRight().x() - m_nEllipseWidth / 2, \
-                                  outLintRect.topRight().y() - m_nEllipseWidth / 2, \
-                                  m_nEllipseWidth, m_nEllipseWidth), m_closePixmap);
+            outLintRect.topRight().y() - m_nEllipseWidth / 2, \
+            m_nEllipseWidth, m_nEllipseWidth), m_closePixmap);
 
     painter->drawEllipse(outLintRect.bottomLeft(), m_nEllipseWidth, m_nEllipseWidth);
     if (!m_rotatePixmap.isNull())
         painter->drawPixmap(QRect(outLintRect.bottomLeft().x() - m_nEllipseWidth / 2, \
-                                  outLintRect.bottomLeft().y() - m_nEllipseWidth / 2, \
-                                  m_nEllipseWidth, m_nEllipseWidth), m_rotatePixmap);
+            outLintRect.bottomLeft().y() - m_nEllipseWidth / 2, \
+            m_nEllipseWidth, m_nEllipseWidth), m_rotatePixmap);
 
     if (m_isResizeable)
     {
         painter->drawEllipse(outLintRect.bottomRight(), m_nEllipseWidth, m_nEllipseWidth);
         if (!m_resizePixmap.isNull())
             painter->drawPixmap(QRect(outLintRect.bottomRight().x() - m_nEllipseWidth / 2, \
-                                      outLintRect.bottomRight().y() - m_nEllipseWidth / 2, \
-                                      m_nEllipseWidth, m_nEllipseWidth), m_resizePixmap);
+                outLintRect.bottomRight().y() - m_nEllipseWidth / 2, \
+                m_nEllipseWidth, m_nEllipseWidth), m_resizePixmap);
     }
 }
 
@@ -133,7 +134,7 @@ QPainterPath UICanvasItemBase::shape() const
     return path;
 }
 
-void UICanvasItemBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void UICanvasItemBase::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     QRectF itemRect = this->getCustomRect();
     QRectF outLintRect = itemRect.adjusted(-m_nInterval, -m_nInterval, m_nInterval, m_nInterval);
@@ -162,7 +163,7 @@ void UICanvasItemBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsItem::mousePressEvent(event);
 }
 
-void UICanvasItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void UICanvasItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     // 获取场景坐标和本地坐标
     QPointF scenePos = event->scenePos();
@@ -187,7 +188,7 @@ void UICanvasItemBase::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsItem::mouseMoveEvent(event);
 }
 
-void UICanvasItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void UICanvasItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     // 获取场景坐标和本地坐标
     QPointF scenePos = event->scenePos();
@@ -213,7 +214,7 @@ void UICanvasItemBase::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsItem::mouseReleaseEvent(event);
 }
 
-QVariant UICanvasItemBase::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant UICanvasItemBase::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
 {
     if (change == QGraphicsItem::ItemSelectedChange)
         prepareGeometryChange();
@@ -279,7 +280,7 @@ void UICanvasItemBase::mouseMoveRotateOperator(const QPointF& scenePos, const QP
     qreal angle = dotValue * 1.0 / (PI / 180);
 
     // 向量叉乘获取方向
-    QVector3D crossValue = QVector3D::crossProduct(QVector3D(startVec, 1.0),QVector3D(endVec, 1.0));
+    QVector3D crossValue = QVector3D::crossProduct(QVector3D(startVec, 1.0), QVector3D(endVec, 1.0));
     if (crossValue.z() < 0)
         angle = -angle;
     m_rotate += angle;
@@ -335,7 +336,7 @@ void UICanvasItemBase::mouseReleaseRotateOperator(const QPointF& scenePos, const
     m_pRotateAttribute->setValue(tempRotate, true);
 }
 
-void UICanvasItemBase::customPaint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void UICanvasItemBase::customPaint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 
 }
@@ -344,17 +345,19 @@ QRectF UICanvasItemBase::getCustomRect(void) const
 {
     QPointF centerPos(0, 0);
     return QRectF(centerPos.x() - m_size.width() / 2, centerPos.y() - m_size.height() / 2, \
-                  m_size.width(), m_size.height());
+        m_size.width(), m_size.height());
 }
 
 void UICanvasItemBase::initIcon(void)
 {
+    QString curAppPath = qApp->applicationDirPath() + "/";
+
     if (m_closeIcon.isNull())
-        m_closeIcon.load("./Images/close.png");
+        m_closeIcon.load(curAppPath + "./Images/close.png");
     if (m_resizeIcon.isNull())
-        m_resizeIcon.load("./Images/resize.png");
+        m_resizeIcon.load(curAppPath + "./Images/resize.png");
     if (m_rotateIcon.isNull())
-        m_rotateIcon.load("./Images/rotate.png");
+        m_rotateIcon.load(curAppPath + "./Images/rotate.png");
 
     m_closePixmap = QPixmap::fromImage(m_closeIcon);
     m_resizePixmap = QPixmap::fromImage(m_resizeIcon);

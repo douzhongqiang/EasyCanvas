@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QApplication>
 #include "UICanvas/UICanvasItemManager.h"
 #include "UICanvas/UICanvasView.h"
 #include "NDNodeBase.h"
@@ -25,8 +26,9 @@ SQLCore::~SQLCore()
 
 void SQLCore::init(void)
 {
+    QString curAppPath = qApp->applicationDirPath() + "/";
     QSqlDatabase sqlDatabelse = QSqlDatabase::addDatabase("QSQLITE");
-    sqlDatabelse.setDatabaseName("./EasyCanvasScheme.db");
+    sqlDatabelse.setDatabaseName(curAppPath + "./EasyCanvasScheme.db");
 
     // 打开数据库
     bool result = sqlDatabelse.open();
@@ -42,16 +44,16 @@ void SQLCore::createSchemeTables(const QString& schemeName)
 {
     // 创建方案表
     QString mainTable("CREATE TABLE IF NOT EXISTS %1 ("
-                   "id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"
-                   "nodeName VARCHAR(255) NOT NULL,"
-                   "nodeType INT NOT NULL,"
-                   "nodeInfo TEXT NOT NULL)");
+        "id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"
+        "nodeName VARCHAR(255) NOT NULL,"
+        "nodeType INT NOT NULL,"
+        "nodeInfo TEXT NOT NULL)");
 
     mainTable = mainTable.arg(schemeName);
     bool result = m_pSqlQuery->exec(mainTable);
     if (!result)
     {
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
         return;
     }
 }
@@ -60,18 +62,18 @@ void SQLCore::createSchemeTables(const QString& schemeName)
 void SQLCore::createSchemeManagerTable(void)
 {
     QString schemeManagerString("CREATE TABLE IF NOT EXISTS %1 ("
-                                "schemeName VARCHAR(200) PRIMARY KEY NOT NULL,"
-                                "createTime DATATIME NOT NULL,"
-                                "editTime DATATIME NOT NULL,"
-                                "indexCount VARCHAR(60) NOT NULL,"
-                                "imageWidth INT, "
-                                "imageHeight INT,"
-                                "image MEDIUMBLOL)");
+        "schemeName VARCHAR(200) PRIMARY KEY NOT NULL,"
+        "createTime DATATIME NOT NULL,"
+        "editTime DATATIME NOT NULL,"
+        "indexCount VARCHAR(60) NOT NULL,"
+        "imageWidth INT, "
+        "imageHeight INT,"
+        "image MEDIUMBLOL)");
 
     schemeManagerString = schemeManagerString.arg(m_schemeTableName);
     bool result = m_pSqlQuery->exec(schemeManagerString);
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 // 数据存储
@@ -82,7 +84,7 @@ void SQLCore::saveData(const QString& schemenName)
 
     // 主表
     QString insertString = "INSERT INTO %1 (id, nodeName, nodeType, nodeInfo)"
-                           "VALUES(:id, :nodeName, :nodeType, :nodeInfo)";
+        "VALUES(:id, :nodeName, :nodeType, :nodeInfo)";
     insertString = insertString.arg(schemenName);
     m_pSqlQuery->prepare(insertString);
 
@@ -91,7 +93,7 @@ void SQLCore::saveData(const QString& schemenName)
     NDNodeBase* pSceneNode = g_currentCanvasManager->getCurrentCanvasView()->getCurrentSceneNode();
     nodes << pSceneNode;
     QStringList nodeNames = g_currentCanvasManager->getAllNodeNames();
-    foreach (const QString& nodeName, nodeNames)
+    foreach(const QString & nodeName, nodeNames)
     {
         NDNodeBase* pNode = g_currentCanvasManager->getNode(nodeName);
         nodes << pNode;
@@ -121,7 +123,7 @@ void SQLCore::saveData(const QString& schemenName)
         bool result = m_pSqlQuery->exec();
         if (!result)
         {
-            qDebug() << m_pSqlQuery->lastError().text();
+            qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
         }
     }
 }
@@ -134,7 +136,7 @@ void SQLCore::cleanData(const QString& schemenName)
     QString delString = deleteString.arg(schemenName);
     bool result = m_pSqlQuery->exec(delString);
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 void SQLCore::getSchemeInfoList(std::set<SchemeDataInfo::SchemeInfo>& infos)
@@ -171,7 +173,7 @@ void SQLCore::getSchemeInfoList(std::set<SchemeDataInfo::SchemeInfo>& infos)
 QString SQLCore::getCurrentIndexCountString(void)
 {
     QStringList strList;
-    for (int i=(int)UICanvasItemManager::t_RectItem; i<(int)UICanvasItemManager::t_End; ++i)
+    for (int i = (int)UICanvasItemManager::t_RectItem; i < (int)UICanvasItemManager::t_End; ++i)
     {
         UICanvasItemManager::CanvasItemType itemType = (UICanvasItemManager::CanvasItemType)i;
         int indexCount = g_currentCanvasManager->getNodeCounts(itemType);
@@ -185,7 +187,7 @@ QString SQLCore::getCurrentIndexCountString(void)
 void SQLCore::insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info)
 {
     QString insertString = QString("INSERT INTO %1 (schemeName, createTime, editTime, indexCount, imageWidth, imageHeight, image)"
-                           "VALUES(:schemeName, :createTime, :editTime, :indexCount, :imageWidth, :imageHeight, :image)").arg(m_schemeTableName);
+        "VALUES(:schemeName, :createTime, :editTime, :indexCount, :imageWidth, :imageHeight, :image)").arg(m_schemeTableName);
 
     m_pSqlQuery->prepare(insertString);
     m_pSqlQuery->bindValue(":schemeName", info.schemeName);
@@ -219,13 +221,13 @@ void SQLCore::insertSchemeInfo(const SchemeDataInfo::SchemeInfo& info)
 void SQLCore::editSchemeInfo(const QString& schemeName, const SchemeDataInfo::SchemeInfo& info)
 {
     QString updateString("UPDATE %1 SET schemeName=:schemeName, "
-                         "createTime=:createTime, "
-                         "editTime=:editTime, "
-                         "indexCount=:indexCount, "
-                         "imageWidth=:imageWidth, "
-                         "imageHeight=:imageHeight, "
-                         "image=:image "
-                         "WHERE schemeName=\'%2\';");
+        "createTime=:createTime, "
+        "editTime=:editTime, "
+        "indexCount=:indexCount, "
+        "imageWidth=:imageWidth, "
+        "imageHeight=:imageHeight, "
+        "image=:image "
+        "WHERE schemeName=\"%2\";");
     updateString = updateString.arg(m_schemeTableName).arg(schemeName);
     m_pSqlQuery->prepare(updateString);
 
@@ -253,12 +255,12 @@ void SQLCore::editSchemeInfo(const QString& schemeName, const SchemeDataInfo::Sc
 void SQLCore::deleteSchemeInfo(const QString& schemeName)
 {
     // 删除管理表中的记录
-    QString deleteString("DELETE FROM %1 WHERE schemeName=\'%2\'");
+    QString deleteString("DELETE FROM %1 WHERE schemeName=\"%2\"");
     deleteString = deleteString.arg(m_schemeTableName).arg(schemeName);
 
     bool result = m_pSqlQuery->exec(deleteString);
     if (!result)
-        qDebug() << m_pSqlQuery->lastError().text();
+        qDebug() << __FUNCTION__ << deleteString << "; " << m_pSqlQuery->lastError().text();
 
     // 删除属性表
     QString deleteAttrString("DROP TABLE %1;");
@@ -273,7 +275,7 @@ void SQLCore::deleteSchemeInfo(const QString& schemeName)
 void SQLCore::changedSchemeName(const QString& schemeName, const QString& destName)
 {
     // 修该方案表中的名字
-    QString updateSqlString = "UPDATE %1 SET schemeName=:schemeName WHERE schemeName = \'%2\'";
+    QString updateSqlString = "UPDATE %1 SET schemeName=:schemeName WHERE schemeName = \"%2\"";
     updateSqlString = updateSqlString.arg(m_schemeTableName).arg(schemeName);
     m_pSqlQuery->prepare(updateSqlString);
     m_pSqlQuery->bindValue(":schemeName", destName);
@@ -285,8 +287,8 @@ void SQLCore::changedSchemeName(const QString& schemeName, const QString& destNa
     QString reNameString = "ALTER TABLE %1 RENAME TO %2";
     reNameString = reNameString.arg(schemeName).arg(destName);
     result = m_pSqlQuery->exec(reNameString);
-        if (!result)
-            qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
+    if (!result)
+        qDebug() << __FUNCTION__ << m_pSqlQuery->lastError().text();
 }
 
 void SQLCore::loadScheme(const QString& schemeName)

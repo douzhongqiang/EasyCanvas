@@ -14,6 +14,7 @@
 #include <QSharedPointer>
 #include <QInputDialog>
 #include <QDesktopServices>
+#include <QApplication>
 #include "NDNodeBase.h"
 #include "UIAboutMeDialog.h"
 #include "PythonWrapCore.h"
@@ -25,7 +26,7 @@
 #include "GlobalHotKey/GlobalHotKeyManager.h"
 #include "GlobalHotKey/GlobalHotKeyInfo.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     // 创建画布
@@ -63,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->addDockWidget(Qt::LeftDockWidgetArea, m_pNodeTreeDockWidget);
 
     QObject::connect(m_pCanvasView, &UICanvasView::itemSelectedChanged, \
-                     this, &MainWindow::onSelectedItemChanged);
+        this, &MainWindow::onSelectedItemChanged);
 
     initToolBar();
     initMenuBar();
@@ -95,7 +96,7 @@ QWidget* MainWindow::createScriptConsoleWidget(void)
     mainLayout->addWidget(m_pScriptConsole);
 
     // 添加菜单
-    QMenu *pFileMenu = new QMenu(tr("File"));
+    QMenu* pFileMenu = new QMenu(tr("File"));
     pMenuBar->addMenu(pFileMenu);
     QAction* pFileAction = new QAction(tr("Open Script File"));
     QObject::connect(pFileAction, &QAction::triggered, this, &MainWindow::onClickedOpenScript);
@@ -152,34 +153,36 @@ void MainWindow::initToolBar(void)
     m_pToolBar = new QToolBar;
     this->addToolBar(m_pToolBar);
 
-    QAction* pArrowDrawButton = new QAction(QIcon("./images/arrowItem.png"), tr("Select"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+
+    QAction* pArrowDrawButton = new QAction(QIcon(curAppPath + "./images/arrowItem.png"), tr("Select"));
     pArrowDrawButton->setCheckable(true);
     pArrowDrawButton->setChecked(true);
     QObject::connect(pArrowDrawButton, &QAction::triggered, this, &MainWindow::onClickedArrowButton);
     m_pToolBar->addAction(pArrowDrawButton);
 
-    QAction* pFreedowDrawButton = new QAction(QIcon("./images/freeDrawItem.png"), tr("Pen Item"));
+    QAction* pFreedowDrawButton = new QAction(QIcon(curAppPath + "./images/freeDrawItem.png"), tr("Pen Item"));
     pFreedowDrawButton->setCheckable(true);
     QObject::connect(pFreedowDrawButton, &QAction::triggered, this, &MainWindow::onClickedFreeDrawButton);
     m_pToolBar->addAction(pFreedowDrawButton);
 
-    QAction* pImageButton = new QAction(QIcon("./images/imageItem.png"), tr("Image Item"));
+    QAction* pImageButton = new QAction(QIcon(curAppPath + "./images/imageItem.png"), tr("Image Item"));
     QObject::connect(pImageButton, &QAction::triggered, this, &MainWindow::onClickedImageButton);
     m_pToolBar->addAction(pImageButton);
 
-    QAction* pEllipseButton = new QAction(QIcon("./images/ellipseItem.png"), tr("Ellipse Item"));
+    QAction* pEllipseButton = new QAction(QIcon(curAppPath + "./images/ellipseItem.png"), tr("Ellipse Item"));
     QObject::connect(pEllipseButton, &QAction::triggered, this, &MainWindow::onClickedEllipseButton);
     m_pToolBar->addAction(pEllipseButton);
 
-    QAction* pRectButton = new QAction(QIcon("./images/rectItem.png"), tr("Rect Item"));
+    QAction* pRectButton = new QAction(QIcon(curAppPath + "./images/rectItem.png"), tr("Rect Item"));
     QObject::connect(pRectButton, &QAction::triggered, this, &MainWindow::onClickedRectButton);
     m_pToolBar->addAction(pRectButton);
 
-    QAction* pTextButton = new QAction(QIcon("./images/textItem.png"), tr("Text Item"));
+    QAction* pTextButton = new QAction(QIcon(curAppPath + "./images/textItem.png"), tr("Text Item"));
     QObject::connect(pTextButton, &QAction::triggered, this, &MainWindow::onClickedTextButton);
     m_pToolBar->addAction(pTextButton);
 
-    QAction* pAudioButton = new QAction(QIcon("./images/audioItem.png"), tr("Audio Item"));
+    QAction* pAudioButton = new QAction(QIcon(curAppPath + "./images/audioItem.png"), tr("Audio Item"));
     QObject::connect(pAudioButton, &QAction::triggered, this, &MainWindow::onClickedAudioButton);
     m_pToolBar->addAction(pAudioButton);
 }
@@ -246,31 +249,33 @@ void MainWindow::initMenuBar(void)
     QMenu* canvasItem = new QMenu(tr("CanvasItem"));
     menuBar->addMenu(canvasItem);
 
-    QAction* pArrowDrawButton = new QAction(QIcon("./images/arrowItem.png"), tr("Select"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+
+    QAction* pArrowDrawButton = new QAction(QIcon(curAppPath + "./images/arrowItem.png"), tr("Select"));
     QObject::connect(pArrowDrawButton, &QAction::triggered, this, &MainWindow::onClickedArrowButton);
     canvasItem->addAction(pArrowDrawButton);
 
-    QAction* pFreedowDrawButton = new QAction(QIcon("./images/freeDrawItem.png"), tr("Pen Item"));
+    QAction* pFreedowDrawButton = new QAction(QIcon(curAppPath + "./images/freeDrawItem.png"), tr("Pen Item"));
     QObject::connect(pFreedowDrawButton, &QAction::triggered, this, &MainWindow::onClickedFreeDrawButton);
     canvasItem->addAction(pFreedowDrawButton);
 
-    QAction* pImageButton = new QAction(QIcon("./images/imageItem.png"), tr("Image Item"));
+    QAction* pImageButton = new QAction(QIcon(curAppPath + "./images/imageItem.png"), tr("Image Item"));
     QObject::connect(pImageButton, &QAction::triggered, this, &MainWindow::onClickedImageButton);
     canvasItem->addAction(pImageButton);
 
-    QAction* pEllipseButton = new QAction(QIcon("./images/ellipseItem.png"), tr("Ellipse Item"));
+    QAction* pEllipseButton = new QAction(QIcon(curAppPath + "./images/ellipseItem.png"), tr("Ellipse Item"));
     QObject::connect(pEllipseButton, &QAction::triggered, this, &MainWindow::onClickedEllipseButton);
     canvasItem->addAction(pEllipseButton);
 
-    QAction* pRectButton = new QAction(QIcon("./images/rectItem.png"), tr("Rect Item"));
+    QAction* pRectButton = new QAction(QIcon(curAppPath + "./images/rectItem.png"), tr("Rect Item"));
     QObject::connect(pRectButton, &QAction::triggered, this, &MainWindow::onClickedRectButton);
     canvasItem->addAction(pRectButton);
 
-    QAction* pTextButton = new QAction(QIcon("./images/textItem.png"), tr("Text Item"));
+    QAction* pTextButton = new QAction(QIcon(curAppPath + "./images/textItem.png"), tr("Text Item"));
     QObject::connect(pTextButton, &QAction::triggered, this, &MainWindow::onClickedTextButton);
     canvasItem->addAction(pTextButton);
 
-    QAction* pAudioButton = new QAction(QIcon("./images/audioItem.png"), tr("Audio Item"));
+    QAction* pAudioButton = new QAction(QIcon(curAppPath + "./images/audioItem.png"), tr("Audio Item"));
     QObject::connect(pAudioButton, &QAction::triggered, this, &MainWindow::onClickedAudioButton);
     canvasItem->addAction(pAudioButton);
 
@@ -332,7 +337,8 @@ void MainWindow::onClickedTextButton(void)
 
 void MainWindow::onClickedSaveToImage(void)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), "./EasyCanvas.png", tr("Images (*.png *.jpg *.bmp)"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), curAppPath + "./EasyCanvas.png", tr("Images (*.png *.jpg *.bmp)"));
     if (fileName.isEmpty())
         return;
 
@@ -344,7 +350,8 @@ void MainWindow::onClickedSaveToImage(void)
 
 void MainWindow::onClickedOpenScript(void)
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Script File"), "./", tr("Python (*.py)"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Script File"), curAppPath + "./", tr("Python (*.py)"));
     if (fileName.isEmpty())
         return;
 

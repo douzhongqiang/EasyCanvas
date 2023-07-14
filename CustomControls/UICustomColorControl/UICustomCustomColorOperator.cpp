@@ -2,6 +2,7 @@
 #include <QDomElement>
 #include <QFile>
 #include <QTextStream>
+#include <QApplication>
 
 const QString UICustomCustomColorOperator::m_cFileName = "./CustomColor.xml";
 
@@ -19,7 +20,8 @@ UICustomCustomColorOperator::~UICustomCustomColorOperator()
 // 保存和加载颜色
 void UICustomCustomColorOperator::saveCustomColors(const QList<QColor>& colors)
 {
-    QFile file(m_cFileName);
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QFile file(curAppPath + m_cFileName);
     if (file.exists())
         file.remove();
 
@@ -45,7 +47,7 @@ void UICustomCustomColorOperator::saveCustomColors(const QList<QColor>& colors)
         rootElement.appendChild(element);
     }
 
-    QFile xmlFile(m_cFileName);
+    QFile xmlFile(curAppPath + m_cFileName);
     xmlFile.open(QFile::WriteOnly);
     QTextStream out_stream(&xmlFile);
     doc.save(out_stream, 4);
@@ -57,7 +59,8 @@ void UICustomCustomColorOperator::loadCustonColors(QList<QColor>& colors)
     colors.clear();
 
     // open file
-    QFile file(m_cFileName);
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QFile file(curAppPath + m_cFileName);
     if (!file.open(QFile::ReadOnly))
         return;
 

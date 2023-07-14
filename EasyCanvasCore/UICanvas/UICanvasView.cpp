@@ -10,12 +10,13 @@
 #include "UICanvasAudioItem.h"
 #include "UICanvasScene.h"
 #include "UICanvasItemManager.h"
+#include <QApplication>
 
 UICanvasView::UICanvasView(QWidget* parent)
     :QGraphicsView(parent)
-    ,m_pCurrentOper(nullptr)
-    ,m_cSelectedPenColor(200, 100, 100)
-    ,m_cSelectedBrushColor(0, 0, 200, 100)
+    , m_pCurrentOper(nullptr)
+    , m_cSelectedPenColor(200, 100, 100)
+    , m_cSelectedBrushColor(0, 0, 200, 100)
 {
     // 初始化CanvasManager
     UICanvasItemManager::createCanvasManager();
@@ -26,7 +27,7 @@ UICanvasView::UICanvasView(QWidget* parent)
 
     m_pScene = new UICanvasScene;
     QObject::connect(m_pScene, &UICanvasScene::selectionChanged, \
-                     this, &UICanvasView::itemSelectedChanged);
+        this, &UICanvasView::itemSelectedChanged);
 
     this->setScene(m_pScene);
     //this->setSceneRect(0, 0, 5000, 5000);
@@ -35,7 +36,8 @@ UICanvasView::UICanvasView(QWidget* parent)
     this->setCurrentOperator(new UICanvasDefaultOper(this));
 
     m_penPixmap = QPixmap();
-    m_penPixmap.load("./images/freeDrawItem.png");
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    m_penPixmap.load(curAppPath + "./images/freeDrawItem.png");
 }
 
 UICanvasView::~UICanvasView()
@@ -81,7 +83,7 @@ void UICanvasView::setSelectedRect(const QRect& rect)
     QPointF startPos = this->mapToScene(rect.topLeft());
     QPointF endPos = this->mapToScene(rect.bottomRight());
     m_selectedRect = QRect(QPoint(startPos.x(), startPos.y()), \
-                           QPoint(endPos.x(), endPos.y()));
+        QPoint(endPos.x(), endPos.y()));
 
     this->viewport()->update();
 }
@@ -115,12 +117,12 @@ void UICanvasView::keyPressEvent(QKeyEvent* event)
     m_pCurrentOper->disposeKeyPressEvent(event);
 }
 
-void UICanvasView::drawBackground(QPainter * painter, const QRectF & rect)
+void UICanvasView::drawBackground(QPainter* painter, const QRectF& rect)
 {
     return QGraphicsView::drawBackground(painter, rect);
 }
 
-void UICanvasView::drawForeground(QPainter * painter, const QRectF & rect)
+void UICanvasView::drawForeground(QPainter* painter, const QRectF& rect)
 {
     if (!m_isSelectedRectVisible)
         return QGraphicsView::drawForeground(painter, rect);
@@ -158,7 +160,7 @@ UICanvasView::CanvasMode UICanvasView::getCurrentMode(void)
 
 NDNodeBase* UICanvasView::getCurrentSelectedNode(void)
 {
-    QList<QGraphicsItem *> items = m_pScene->selectedItems();
+    QList<QGraphicsItem*> items = m_pScene->selectedItems();
     if (items.size() == 1)
     {
         UICanvasItemBase* canvasItem = qgraphicsitem_cast<UICanvasItemBase*>(items[0]);
@@ -175,7 +177,7 @@ QList<NDNodeBase*> UICanvasView::getCurrentSelectedNodes(void)
 {
     QList<NDNodeBase*> nodes;
 
-    QList<QGraphicsItem *> items = m_pScene->selectedItems();
+    QList<QGraphicsItem*> items = m_pScene->selectedItems();
     for (auto iter = items.begin(); iter != items.end(); ++iter)
     {
         UICanvasItemBase* canvasItem = qgraphicsitem_cast<UICanvasItemBase*>(*iter);
@@ -190,7 +192,7 @@ QList<UICanvasItemBase*> UICanvasView::getCurrentSelectedItems(void)
 {
     QList<UICanvasItemBase*> selectedItems;
 
-    QList<QGraphicsItem *> items = m_pScene->selectedItems();
+    QList<QGraphicsItem*> items = m_pScene->selectedItems();
     for (auto iter = items.begin(); iter != items.end(); ++iter)
     {
         UICanvasItemBase* canvasItem = qgraphicsitem_cast<UICanvasItemBase*>(*iter);

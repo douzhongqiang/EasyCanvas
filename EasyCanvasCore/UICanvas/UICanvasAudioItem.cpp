@@ -13,15 +13,15 @@
 
 UICanvasAudioItem::UICanvasAudioItem(QGraphicsItem* parentItem)
     :UICanvasItemBase(parentItem)
-    ,m_cStartColor(150, 255, 200)
-    ,m_cEndColor(46, 216, 130)
+    , m_cStartColor(150, 255, 200)
+    , m_cEndColor(46, 216, 130)
 {
     setCurrentSize(QSize(300, 60));
     initAttributes();
 
     m_pAudioPlayer = new AudioPlayer(this);
     QObject::connect(m_pAudioPlayer, &AudioPlayer::playFinished, \
-                     this, &UICanvasAudioItem::onAudioPlayFinished);
+        this, &UICanvasAudioItem::onAudioPlayFinished);
 }
 
 UICanvasAudioItem::~UICanvasAudioItem()
@@ -38,7 +38,7 @@ void UICanvasAudioItem::setCurrentSize(const QSize& size)
     this->updateAttribute();
 }
 
-void UICanvasAudioItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void UICanvasAudioItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     QRectF rect = this->getCustomRect();
     qreal interval = rect.height() / 4.0;
@@ -60,7 +60,7 @@ void UICanvasAudioItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void UICanvasAudioItem::customPaint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void UICanvasAudioItem::customPaint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->save();
 
@@ -114,10 +114,10 @@ void UICanvasAudioItem::customPaint(QPainter *painter, const QStyleOptionGraphic
     painter->setPen(pen);
     QString timeString = "%1:%2\"";
     timeString = timeString.arg(m_nTotlaAudioTime / 1000 / 60, 2, 10, QChar('0'))\
-            .arg(m_nTotlaAudioTime / 1000 % 60, 2, 10, QChar('0'));
+        .arg(m_nTotlaAudioTime / 1000 % 60, 2, 10, QChar('0'));
     int width = painter->fontMetrics().width(timeString);
     QRectF timeRectF(rect.right() - width - interval, rect.top() + interval, \
-                      width, interval * 2);
+        width, interval * 2);
     QTextOption o;
     painter->drawText(timeRectF, timeString);
 
@@ -137,7 +137,7 @@ void UICanvasAudioItem::initAttributes(void)
     m_pFilePathAttribute->setShowButton(true);
     m_pFilePathAttribute->setButtonString(tr("Browse"));
     m_pFilePathAttribute->setButtonFunction(std::bind(&UICanvasAudioItem::showFileBroseDialo, this, \
-                                                      std::placeholders::_1));
+        std::placeholders::_1));
     m_pNode->addAttribute(otherAttrs, m_pFilePathAttribute);
 
     // 颜色属性
@@ -162,8 +162,9 @@ void UICanvasAudioItem::initAttributes(void)
 
 bool UICanvasAudioItem::showFileBroseDialo(QString& str)
 {
-    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Audio File"), "./", \
-                                 tr("Audio Files (*.wav *.mp3)"));
+    QString curAppPath = qApp->applicationDirPath() + "/";
+    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Audio File"), curAppPath + "./", \
+        tr("Audio Files (*.wav *.mp3)"));
     if (fileName.isEmpty())
         return false;
 
