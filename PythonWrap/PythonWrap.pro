@@ -38,10 +38,12 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/debug -lPythonQt_QtAll-Qt5-Python38_d -lPythonQt-Qt5-Python38_d
     LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3_d -lpython38_d
 } else {
-    #LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
-    #LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
-    LIBS += -L$$PWD/../thirdLibs/PythonQt_3_10/libs/release -lPythonQt_QtAll-Qt5-Python3.10 -lPythonQt-Qt5-Python3.10
-    LIBS += -L$$PWD/../thirdLibs/python3_10/libs -lpython3 -lpython310
+    LIBS += -L$$PWD/../thirdLibs/PythonQt/libs/release -lPythonQt_QtAll-Qt5-Python38 -lPythonQt-Qt5-Python38
+    LIBS += -L$$PWD/../thirdLibs/python3_8/libs -lpython3 -lpython38
+
+    # python3.10 , VS2019
+    #LIBS += -L$$PWD/../thirdLibs/PythonQt_3_10/libs/release -lPythonQt_QtAll-Qt5-Python3.10 -lPythonQt-Qt5-Python3.10
+    #LIBS += -L$$PWD/../thirdLibs/python3_10/libs -lpython3 -lpython310
 }
 
 QMAKE_CXXFLAGS_RELEASE += /Zi
