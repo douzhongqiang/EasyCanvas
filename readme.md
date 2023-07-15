@@ -26,6 +26,9 @@
 
 4. 源码中未提供Python库环境，如果运行失败可以安装Python3.8。或者将绿色版的 **Lib** 目录拷贝到生成的程序的可执行文件所在目录。**（PythonQt::Init()）** 程序闪退，可按此步骤解决。
 
+如果使用VS2019+Qt5.15.1 可以直接下载这个版本
+链接：https://pan.baidu.com/s/1B22HTJKUe_f3Qmv_P1Bgbg  提取码：uys6
+
 基本数据组织类图如下：
 ![类图](./EasyCanves类图.jpg)
 
