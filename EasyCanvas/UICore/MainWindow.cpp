@@ -421,7 +421,7 @@ void MainWindow::onClickedAboutMe(void)
 
 void MainWindow::onClickedHelpScript(void)
 {
-    QDesktopServices::openUrl(QUrl("https://www.douzhq.cn/easycanvas_cmd/"));
+    QDesktopServices::openUrl(QUrl("https://www.feijiblog.com/blog/qteasycanvasv2cmd"));
 }
 
 void MainWindow::onClickedScriptEdit(void)
